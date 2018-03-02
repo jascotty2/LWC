@@ -50,7 +50,7 @@ public class LWCMCPCSupport extends JavaModule {
      * @param event
      */
     public void onDestroyProtection(LWCProtectionDestroyEvent event) {
-        if (event.isCancelled()) {
+        if (event.isCancelled() || event.getPlayer() == null) {
             return;
         }
 

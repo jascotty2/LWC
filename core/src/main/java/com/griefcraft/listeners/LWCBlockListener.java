@@ -389,6 +389,11 @@ public class LWCBlockListener implements Listener {
         // Update the cache if a protection is matched here
         Protection current = lwc.findProtection(block.getLocation());
         if (current != null) {
+			// no use checking if the block id matches. 
+			// This is a build event because it didn't exist before, and does now
+			//lwc.log("Removing corrupted protection: " + current);
+            current.remove();
+			/*
             if (!current.isBlockInWorld()) {
                 // Corrupted protection
                 lwc.log("Removing corrupted protection: " + current);
@@ -401,6 +406,7 @@ public class LWCBlockListener implements Listener {
 
                 return;
             }
+			*/
         }
 
         // The placable block must be protectable

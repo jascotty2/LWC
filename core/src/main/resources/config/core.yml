@@ -191,6 +191,22 @@ protections:
             enabled: true
         "*_shulker_box":
             enabled: true
+    entities:
+        armor_stand:
+            enabled: true
+            autoRegister: private
+        painting:
+            enabled: true
+            autoRegister: private
+        item_frame:
+            enabled: true
+            autoRegister: private
+        minecart_chest:
+            enabled: true
+            autoRegister: private
+        minecart_hopper:
+            enabled: true
+            autoRegister: private
 
 modes:
     droptransfer:

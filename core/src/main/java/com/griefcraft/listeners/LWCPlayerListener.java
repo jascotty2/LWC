@@ -28,6 +28,7 @@
 
 package com.griefcraft.listeners;
 
+import com.griefcraft.bukkit.EntityBlock;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
 import com.griefcraft.model.Flag;
@@ -36,6 +37,7 @@ import com.griefcraft.model.Protection;
 import com.griefcraft.scripting.Module;
 import com.griefcraft.scripting.event.LWCBlockInteractEvent;
 import com.griefcraft.scripting.event.LWCDropItemEvent;
+import com.griefcraft.scripting.event.LWCProtectionDestroyEvent;
 import com.griefcraft.scripting.event.LWCProtectionInteractEvent;
 import com.griefcraft.util.UUIDRegistry;
 import org.bukkit.Location;
@@ -45,7 +47,13 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Hopper;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Minecart;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -54,14 +62,28 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -166,12 +188,8 @@ public class LWCPlayerListener implements Listener {
 
         boolean denyHoppers = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(Material.getMaterial(protection.getBlockId()), "denyHoppers"));
 
-        // xor = (a && !b) || (!a && b)
-        if (denyHoppers ^ protection.hasFlag(Flag.Type.HOPPER)) {
-            return true;
-        }
-
-        return false;
+		// xor = (a && !b) || (!a && b)
+        return denyHoppers ^ protection.hasFlag(Flag.Type.HOPPER);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -395,7 +413,11 @@ public class LWCPlayerListener implements Listener {
                 location = ((BlockState) holder).getLocation();
             } else if (holder instanceof DoubleChest) {
                 location = ((DoubleChest) holder).getLocation();
-            } else {
+            } else if (holder instanceof Minecart) {
+				Minecart m = (Minecart) holder;
+				int A = EntityBlock.calcHash(m.getUniqueId().hashCode());
+				location = new Location(m.getWorld(), A, A, A);
+			} else {
                 return;
             }
         } catch (Exception e) {
@@ -474,6 +496,414 @@ public class LWCPlayerListener implements Listener {
             event.setCancelled(true);
         }
     }
+
+	@EventHandler
+	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
+		onDamage(event.getEntity(), event.getRemover(), event, true);
+	}
+	
+	@EventHandler
+	public void onMinecartDamage(VehicleDamageEvent event) {
+		onDamage(event.getVehicle(), event.getAttacker(), event, false);
+	}
+	
+	public static void onDamage(Entity entity, Entity damager, Cancellable event, boolean onBreak) {
+		int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+		LWC lwc = LWC.getInstance();
+		Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+
+		if (damager instanceof Projectile) {
+			ProjectileSource shooter = ((Projectile) damager).getShooter();
+			if (shooter instanceof Player) {
+				damager = (Player) shooter;
+			} else if (protection != null) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+
+		if (damager instanceof Player) {
+			Player p = (Player) damager;
+			if (onPlayerEntityInteract(p, entity, false, event.isCancelled())) {
+				event.setCancelled(true);
+			} else if (onBreak && protection != null) {
+				try {
+					boolean canAccess = lwc.canAccessProtection(p, protection);
+					boolean canAdmin = lwc.canAdminProtection(p, protection);
+
+					LWCProtectionDestroyEvent evt = new LWCProtectionDestroyEvent(
+							p, protection,
+							LWCProtectionDestroyEvent.Method.BLOCK_DESTRUCTION,
+							canAccess, canAdmin);
+					lwc.getModuleLoader().dispatchEvent(evt);
+
+					if (evt.isCancelled() || !canAccess) {
+						event.setCancelled(true);
+					}
+				} catch (Exception e) {
+					event.setCancelled(true);
+					lwc.sendLocale(p, "protection.internalerror", "id", "BLOCK_BREAK");
+					e.printStackTrace();
+				}
+			} else if (protection != null) {
+				event.setCancelled(true);
+			}
+		} else if (protection != null) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onMinecartBreak(VehicleDestroyEvent event) {
+		Entity entity = event.getVehicle();
+		int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+		LWC lwc = LWC.getInstance();
+		Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+
+		Entity breaksource = event.getAttacker();
+		if (breaksource instanceof Projectile) {
+			ProjectileSource shooter = ((Projectile) breaksource).getShooter();
+			if (shooter instanceof Player) {
+				breaksource = (Player) shooter;
+			} else if (protection != null) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+		
+		if (breaksource instanceof Player) {
+			Player p = (Player) breaksource;
+			if (onPlayerEntityInteract(p, entity, false, event.isCancelled())) {
+				event.setCancelled(true);
+			} else if (protection != null) {
+				try {
+					boolean canAccess = lwc.canAccessProtection(p, protection);
+					boolean canAdmin = lwc.canAdminProtection(p, protection);
+
+					LWCProtectionDestroyEvent evt = new LWCProtectionDestroyEvent(
+							p, protection,
+							LWCProtectionDestroyEvent.Method.BLOCK_DESTRUCTION,
+							canAccess, canAdmin);
+					lwc.getModuleLoader().dispatchEvent(evt);
+
+					if (evt.isCancelled() || !canAccess) {
+						event.setCancelled(true);
+					}
+				} catch (Exception e) {
+					event.setCancelled(true);
+					lwc.sendLocale(p, "protection.internalerror", "id", "BLOCK_BREAK");
+					e.printStackTrace();
+				}
+			} else if (protection != null) {
+				event.setCancelled(true);
+			}
+		} else if (protection != null) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void hangingBreak(HangingBreakEvent event) {
+		Entity entity = event.getEntity();
+		int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+
+		LWC lwc = LWC.getInstance();
+		Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+		if (protection != null) {
+			if (event.getCause() == RemoveCause.PHYSICS
+					|| event.getCause() == RemoveCause.EXPLOSION) {
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
+		Entity entity = e.getRightClicked();
+		int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+
+		LWC lwc = LWC.getInstance();
+		Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+		Player p = e.getPlayer();
+		boolean canAccess = lwc.canAccessProtection(p, protection);
+		if (onPlayerEntityInteract(p, entity, true, e.isCancelled())) {
+			e.setCancelled(true);
+		}
+		if (protection != null) {
+			if (canAccess) {
+				return;
+			}
+			e.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void onEntityDamage(EntityDamageEvent e) {
+		if (e instanceof EntityDamageByEntityEvent
+				&& !(e.getCause() == DamageCause.BLOCK_EXPLOSION || e.getCause() == DamageCause.ENTITY_EXPLOSION)) {
+			return; // handle this separately
+		}
+		Entity entity = e.getEntity();
+		int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+
+		LWC lwc = LWC.getInstance();
+		Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+		if (protection != null) {
+			if (e.getCause() != DamageCause.CONTACT) {
+				e.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler
+	public void itemFrameItemRemoval(EntityDamageByEntityEvent event) {
+		Entity entity = event.getEntity();
+		if (entity instanceof Player) {
+			return;
+		}
+		Entity damager = event.getDamager();
+		LWC lwc = LWC.getInstance();
+		int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+		Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+		if (protection != null && damager instanceof Projectile) {
+			ProjectileSource shooter = ((Projectile) damager).getShooter();
+			if (shooter instanceof Player) {
+				damager = (Player) shooter;
+			} else {
+				event.setCancelled(true);
+				return;
+			}
+		}
+		if (!(damager instanceof Player)) {
+			if (protection != null) {
+				event.setCancelled(true);
+			}
+			return;
+		}
+
+		Player player = (Player) damager;
+
+		if (((entity instanceof ItemFrame) || (entity instanceof InventoryHolder)) && lwc.isProtectable(entity.getType())) {
+			// Prevent players with lwc.deny from interacting with blocks that have an inventory
+			if (!lwc.hasPermission(player, "lwc.protect") && lwc.hasPermission(player, "lwc.deny") && !lwc.isAdmin(player) && !lwc.isMod(player)) {
+				lwc.sendLocale(player, "protection.interact.error.blocked");
+				event.setCancelled(true);
+				return;
+			}
+		}
+
+		if (onPlayerEntityInteract(player, entity, false, event.isCancelled())) {
+			event.setCancelled(true);
+		} else {
+			playerDamagedEntities.put(player, entity);
+		}
+	}
+
+	protected final HashMap<Player, Entity> playerDamagedEntities = new HashMap<>();
+
+	@EventHandler
+	public void onDeath(EntityDeathEvent event) {
+		// if you've got this far, it's already destroyed
+		Entity entity = event.getEntity();
+		if (entity instanceof ArmorStand) {
+			int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+			LWC lwc = LWC.getInstance();
+			Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+			if (protection != null) {
+				Player player = event.getEntity().getKiller();
+				if (player == null) {
+					// workaround, because mc apparently doesn't bother to fill this field in
+					final int hash = entity.hashCode();
+					for (Map.Entry<Player, Entity> e : playerDamagedEntities.entrySet()) {
+						if (e.getValue().hashCode() == hash) {
+							player = e.getKey();
+							playerDamagedEntities.remove(e.getKey());
+							break;
+						}
+					}
+				}
+				if (player != null) {
+					try {
+						boolean canAccess = lwc.canAccessProtection(player, protection);
+						boolean canAdmin = lwc.canAdminProtection(player, protection);
+						LWCProtectionDestroyEvent evt = new LWCProtectionDestroyEvent(
+								player, protection,
+								LWCProtectionDestroyEvent.Method.ENTITY_DESTRUCTION,
+								canAccess, canAdmin);
+						lwc.getModuleLoader().dispatchEvent(evt);
+					} catch (Exception ex) {
+						lwc.sendLocale(player, "protection.internalerror", "id", "BLOCK_BREAK");
+						ex.printStackTrace();
+					}
+				}
+				protection.remove();
+			}
+		}
+	}
+/*
+	@EventHandler
+	public void onEntityAtInteract(PlayerInteractAtEntityEvent event) {
+	}*/
+	
+	/**
+	 * Restrict access to protected armor stands
+	 *
+	 * @param event
+	 */
+	@EventHandler
+	public void onEntityInteract(PlayerInteractEntityEvent event) {
+		if (!LWC.ENABLED) {
+			return;
+		}
+
+		Entity entity = event.getRightClicked();
+		if (entity instanceof Player) {
+			return;
+		}
+
+		LWC lwc = LWC.getInstance();
+		Player player = event.getPlayer();
+
+		if (((entity instanceof ItemFrame) || (entity instanceof ArmorStand)) && lwc.isProtectable(entity.getType())) {
+			// Prevent players with lwc.deny from interacting with blocks that have an inventory
+			if (!lwc.hasPermission(player, "lwc.protect") && lwc.hasPermission(player, "lwc.deny") && !lwc.isAdmin(player) && !lwc.isMod(player)) {
+				lwc.sendLocale(player, "protection.interact.error.blocked");
+				event.setCancelled(true);
+				return;
+			}
+		}
+
+		if (onPlayerEntityInteract(player, entity, false, event.isCancelled())) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void storageMinecraftInventoryOpen(InventoryOpenEvent event) {
+		if (!LWC.ENABLED) {
+			return;
+		}
+
+		InventoryHolder holder = event.getInventory().getHolder();
+		if (!(holder instanceof Minecart)) {
+			return;
+		}
+		Entity entity = (Entity) holder;
+
+		if (onPlayerEntityInteract((Player) event.getPlayer(), entity, true, event.isCancelled())) {
+			event.setCancelled(true);
+		}
+	}
+
+	/**
+	 * Checks if interaction is protected
+	 *
+	 * @param player
+	 * @param entity
+	 * @param rightClick if this event is triggered with a right click
+	 * @param cancelled
+	 * @return true if interaction is not allowed
+	 */
+	public static boolean onPlayerEntityInteract(Player player, Entity entity, boolean rightClick, boolean cancelled) {
+		LWC lwc = LWC.getInstance();
+		LWCPlayer lwcPlayer = lwc.wrapPlayer(player);
+		int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+		Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+		try {
+			Set<String> actions = lwcPlayer.getActionNames();
+
+			boolean canAccess = lwc.canAccessProtection(player, protection);
+
+			// Calculate if the player has a pending action (i.e any action besides 'interacted')
+			int actionCount = actions.size();
+			boolean hasInteracted = actions.contains("interacted");
+			boolean hasPendingAction = ((hasInteracted) && (actionCount > 1)) || ((!hasInteracted) && (actionCount > 0));
+
+			// If the event was cancelled and they have an action, warn them
+			if (cancelled) {
+				// only send it if a non-"interacted" action is set which is
+				// always set on the player
+				if (hasPendingAction) {
+					lwc.sendLocale(player, "lwc.pendingaction", new Object[0]);
+				}
+
+				// it's cancelled, do not continue !
+				return false;
+			}
+
+			// register in an action what protection they interacted with (if applicable.)
+			if (protection != null) {
+				com.griefcraft.model.Action action = new com.griefcraft.model.Action();
+				action.setName("interacted");
+				action.setPlayer(lwcPlayer);
+				action.setProtection(protection);
+
+				lwcPlayer.addAction(action);
+			}
+
+			// events are only used when they already have an action pending
+			boolean canAdmin = lwc.canAdminProtection(player, protection);
+			Module.Result result;
+
+			Block fakeBlock = EntityBlock.getEntityBlock(entity);
+			PlayerInteractEvent fakeEvent = new PlayerInteractEvent(player,
+					rightClick ? org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK
+							: org.bukkit.event.block.Action.LEFT_CLICK_BLOCK,
+					null, fakeBlock, null);
+
+			if (protection != null) {
+				LWCProtectionInteractEvent evt = new LWCProtectionInteractEvent(fakeEvent, protection, actions, canAccess, canAdmin);
+				lwc.getModuleLoader().dispatchEvent(evt);
+
+				result = evt.getResult();
+			} else {
+				LWCBlockInteractEvent evt = new LWCBlockInteractEvent(fakeEvent, fakeBlock, actions);
+				lwc.getModuleLoader().dispatchEvent(evt);
+
+				result = evt.getResult();
+			}
+
+			if (result == Module.Result.ALLOW) {
+				return false;
+			}
+
+			// optional.onlyProtectIfOwnerIsOnline
+			if (protection != null && !canAccess) {
+				if (lwc.getConfiguration().getBoolean("optional.onlyProtectWhenOwnerIsOnline", false)) {
+					Player owner = protection.getBukkitOwner();
+
+					// If they aren't online, allow them in :P
+					if (owner == null || !owner.isOnline()) {
+						return false;
+					}
+				}
+			}
+
+			// optional.onlyProtectIfOwnerIsOffline
+			if (protection != null && !canAccess) {
+				if (lwc.getConfiguration().getBoolean("optional.onlyProtectWhenOwnerIsOffline", false)) {
+					Player owner = protection.getBukkitOwner();
+
+					// If they aren't online, allow them in :P
+					if (owner != null && owner.isOnline()) {
+						return false;
+					}
+				}
+			}
+			if (result == Module.Result.DEFAULT) {
+				canAccess = lwc.enforceAccess(player, protection, entity, canAccess);
+			}
+
+			if (!canAccess || result == Module.Result.CANCEL) {
+				return true;
+			}
+		} catch (Exception e) {
+			lwc.sendLocale(player, "protection.internalerror", new Object[]{"id", "PLAYER_INTERACT"});
+			e.printStackTrace();
+			return true;
+		}
+		return false;
+	}
 
     /**
      * Compares the enchantments on two item stacks and checks that they are equal (identical)
