@@ -53,6 +53,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -106,6 +107,10 @@ public class LWCPlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onMoveItem(InventoryMoveItemEvent event) {
+        if (plugin.getLWC().useAlternativeHopperProtection()
+                && !(event.getSource().getHolder() instanceof HopperMinecart || event.getDestination().getHolder() instanceof HopperMinecart))
+            return;
+
         if (plugin.getLWC().useFastHopperProtection() && event.getSource().getHolder() instanceof Hopper)
             return;
 
