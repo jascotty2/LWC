@@ -465,6 +465,15 @@ public class Protection {
     public Flag getFlag(Flag.Type type) {
         return flags.get(type);
     }
+	
+	/**
+	 * Get a copy of the flags for the current protection
+	 * 
+	 * @return 
+	 */
+	public Map<Flag.Type, Flag> getFlags() {
+		return Collections.unmodifiableMap(flags);
+	}
 
     /**
      * Add a flag to the protection
