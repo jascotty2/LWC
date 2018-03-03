@@ -604,22 +604,21 @@ public class Protection {
      * @return
      */
     public boolean isBlockInWorld() {
-        int storedBlockId = getBlockId();
-        Block block = getBlock();
+		Block block = getBlock();
 
-        switch (block.getType()) {
-            case FURNACE:
-            case BURNING_FURNACE:
-                return storedBlockId == Material.FURNACE.getId() || storedBlockId == Material.BURNING_FURNACE.getId();
+		switch (block.getType()) {
+			case FURNACE:
+			case BURNING_FURNACE:
+				return blockId == Material.FURNACE.getId() || blockId == Material.BURNING_FURNACE.getId();
 
-            case STEP:
-            case DOUBLE_STEP:
-                    return storedBlockId == Material.STEP.getId() || storedBlockId == Material.DOUBLE_STEP.getId();
+			case STEP:
+			case DOUBLE_STEP:
+				return blockId == Material.STEP.getId() || blockId == Material.DOUBLE_STEP.getId();
 
-            default:
-                return storedBlockId == block.getTypeId();
-        }
-    }
+			default:
+				return blockId == block.getTypeId();
+		}
+	}
 
     public JSONObject getData() {
         return data;
