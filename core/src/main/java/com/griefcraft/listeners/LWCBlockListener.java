@@ -444,7 +444,7 @@ public class LWCBlockListener implements Listener {
         LWC lwc = plugin.getLWC();
         Player player = event.getPlayer();
         Block block = event.getBlockPlaced();
-
+		
         // Update the cache if a protection is matched here
         Protection current = lwc.findProtection(block.getLocation());
         if (current != null) {
@@ -469,12 +469,12 @@ public class LWCBlockListener implements Listener {
         }
 
         // The placable block must be protectable
-        if (!lwc.isProtectable(block)) {
+        if (!lwc.isProtectable(block)) {System.out.println("Nope!");
             return;
-        }
+        }System.out.println("Ok!");
 
         String autoRegisterType = lwc.resolveProtectionConfiguration(block, "autoRegister");
-
+		System.out.println(autoRegisterType);
         // is it auto protectable?
         if (!autoRegisterType.equalsIgnoreCase("private") && !autoRegisterType.equalsIgnoreCase("public")) {
             return;
