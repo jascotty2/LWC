@@ -1480,6 +1480,10 @@ public class LWC {
      * @return
      */
     public String resolveProtectionConfiguration(Block block, String node) {
+		if(block.getTypeId() >= EntityBlock.ENTITY_BLOCK_ID) {
+			EntityType et = EntityType.fromId(block.getTypeId() - EntityBlock.ENTITY_BLOCK_ID);
+			return et == null ? null : resolveProtectionConfiguration(et, node);
+		}
         Material material = block.getType();
         String cacheKey = block.getData() + "-" + material.toString() + "-" + node;
         if (protectionConfigurationCache.containsKey(cacheKey)) {

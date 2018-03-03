@@ -149,13 +149,22 @@ public class LWCPlayerListener implements Listener {
         } catch (AbstractMethodError e) {
             return false;
         }
+		
+		Block protectionSource;
 
         try {
             if (holder instanceof BlockState) {
                 location = ((BlockState) holder).getLocation();
+				protectionSource = location.getBlock();
             } else if (holder instanceof DoubleChest) {
                 location = ((DoubleChest) holder).getLocation();
-            } else {
+				protectionSource = location.getBlock();
+            } else if (holder instanceof Minecart) {
+				Minecart m = (Minecart) holder;
+				int A = EntityBlock.calcHash(m.getUniqueId().hashCode());
+				location = new Location(m.getWorld(), A, A, A);
+				protectionSource = new EntityBlock(m);
+			} else {
                 return false;
             }
 
@@ -191,7 +200,7 @@ public class LWCPlayerListener implements Listener {
             }
         }
 
-        boolean denyHoppers = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(Material.getMaterial(protection.getBlockId()), "denyHoppers"));
+        boolean denyHoppers = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(protectionSource, "denyHoppers"));
 
 		// xor = (a && !b) || (!a && b)
         return denyHoppers ^ protection.hasFlag(Flag.Type.HOPPER);
