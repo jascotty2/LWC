@@ -14,8 +14,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
-public class EntityBlock implements NMS {
+public class EntityBlock implements Block {
 
+	public static final int ENTITY_BLOCK_ID = 5000;
+	public static final int POSITION_OFFSET = 50000;
+	
 	private final Entity entity;
 
 	public EntityBlock(Entity entity) {
