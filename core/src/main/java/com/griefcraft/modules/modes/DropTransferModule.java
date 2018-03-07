@@ -143,7 +143,7 @@ public class DropTransferModule extends JavaModule {
 
         if (protection == null) {
             lwc.sendLocale(player, "lwc.nolongerexists");
-            player.disableMode(player.getMode("dropTransfer"));
+            player.disableMode(player.getMode("+dropTransfer"));
             return;
         }
 
@@ -152,14 +152,14 @@ public class DropTransferModule extends JavaModule {
 
         if (world == null) {
             lwc.sendLocale(player, "lwc.invalidworld");
-            player.disableMode(player.getMode("dropTransfer"));
+            player.disableMode(player.getMode("+dropTransfer"));
             return;
         }
 
         // Don't allow them to transfer items across worlds
         if (bPlayer.getWorld() != world && !lwc.getConfiguration().getBoolean("modes.droptransfer.crossWorld", false)) {
             lwc.sendLocale(player, "lwc.dropxfer.acrossworlds");
-            player.disableMode(player.getMode("dropTransfer"));
+            player.disableMode(player.getMode("+dropTransfer"));
             return;
         }
 
@@ -279,7 +279,6 @@ public class DropTransferModule extends JavaModule {
         }
 
         String action = args[1].toLowerCase();
-        String playerName = player.getName();
 
         if (action.equals("select")) {
             if (isPlayerDropTransferring(player)) {
