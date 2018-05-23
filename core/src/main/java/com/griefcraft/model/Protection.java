@@ -28,6 +28,7 @@
 
 package com.griefcraft.model;
 
+import com.griefcraft.bukkit.EntityBlock;
 import com.griefcraft.cache.ProtectionCache;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.event.LWCProtectionRemovePostEvent;
@@ -604,21 +605,24 @@ public class Protection {
      * @return
      */
     public boolean isBlockInWorld() {
-		Block block = getBlock();
+        Block block = getBlock();
+        if (block == null) {
+            return false;
+        }
 
-		switch (block.getType()) {
-			case FURNACE:
-			case BURNING_FURNACE:
-				return blockId == Material.FURNACE.getId() || blockId == Material.BURNING_FURNACE.getId();
+        switch (block.getType()) {
+            case FURNACE:
+            case BURNING_FURNACE:
+                return blockId == Material.FURNACE.getId() || blockId == Material.BURNING_FURNACE.getId();
 
-			case STEP:
-			case DOUBLE_STEP:
-				return blockId == Material.STEP.getId() || blockId == Material.DOUBLE_STEP.getId();
+            case STEP:
+            case DOUBLE_STEP:
+                return blockId == Material.STEP.getId() || blockId == Material.DOUBLE_STEP.getId();
 
-			default:
-				return blockId == block.getTypeId();
-		}
-	}
+            default:
+                return blockId == block.getTypeId();
+        }
+    }
 
     public JSONObject getData() {
         return data;
@@ -934,7 +938,7 @@ public class Protection {
      * @return the block representing the protection in the world
      */
     public Block getBlock() {
-        if (cachedBlock != null) {
+        if (cachedBlock != null || getBlockId() > EntityBlock.ENTITY_BLOCK_ID) {
             return cachedBlock;
         }
 

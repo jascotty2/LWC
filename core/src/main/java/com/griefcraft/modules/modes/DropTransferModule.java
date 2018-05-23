@@ -163,7 +163,7 @@ public class DropTransferModule extends JavaModule {
             return;
         }
 
-        Block block = world.getBlockAt(protection.getX(), protection.getY(), protection.getZ());
+        Block block = protection.getBlock();
         Map<Integer, ItemStack> remaining = lwc.depositItems(block, itemStack);
         Map<Integer, ItemStack> forceDrop = null;
 
@@ -230,8 +230,8 @@ public class DropTransferModule extends JavaModule {
         }
 
         player.removeAllActions(); // ignore the persist mode
-		// don't allow the block to be interacted with
-		event.setResult(Result.CANCEL);
+        // don't allow the block to be interacted with
+        event.setResult(Result.CANCEL);
     }
 
     @Override
