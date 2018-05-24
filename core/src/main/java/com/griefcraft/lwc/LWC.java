@@ -27,7 +27,6 @@
  */
 package com.griefcraft.lwc;
 
-import com.griefcraft.bukkit.EntityBlock;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,6 +63,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.mcstats.Metrics;
 
+import com.griefcraft.bukkit.EntityBlock;
 import com.griefcraft.cache.ProtectionCache;
 import com.griefcraft.integration.ICurrency;
 import com.griefcraft.integration.IPermissions;
@@ -74,6 +74,7 @@ import com.griefcraft.integration.permissions.VaultPermissions;
 import com.griefcraft.io.BackupManager;
 import com.griefcraft.listeners.LWCMCPCSupport;
 import com.griefcraft.migration.ConfigPost300;
+import com.griefcraft.migration.DatabaseUpgradeManager;
 import com.griefcraft.migration.MySQLPost200;
 import com.griefcraft.model.Flag;
 import com.griefcraft.model.History;
@@ -1450,6 +1451,9 @@ public class LWC {
      * @return
      */
     public String resolveProtectionConfiguration(EntityType entity, String node) {
+        if (entity == null) {
+            return null;
+        }
         String cacheKey = "ent-" + entity.toString() + "-" + node;
         if (protectionConfigurationCache.containsKey(cacheKey)) {
             return protectionConfigurationCache.get(cacheKey);
@@ -1676,6 +1680,9 @@ public class LWC {
 
         // check any major conversions
         new MySQLPost200().run();
+        
+        // check for version conversion
+        DatabaseUpgradeManager.run();
 
         // precache protections
         physicalDatabase.precache();

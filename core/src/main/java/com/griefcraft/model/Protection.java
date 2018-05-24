@@ -938,8 +938,10 @@ public class Protection {
      * @return the block representing the protection in the world
      */
     public Block getBlock() {
-        if (cachedBlock != null || getBlockId() > EntityBlock.ENTITY_BLOCK_ID) {
+        if (cachedBlock != null) {
             return cachedBlock;
+        } else if(getBlockId() > EntityBlock.ENTITY_BLOCK_ID) {
+            return cachedBlock = new EntityBlock(world, getBlockId(), x);
         }
 
         World world = getBukkitWorld();

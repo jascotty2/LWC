@@ -525,6 +525,15 @@ public class LWCPlayerListener implements Listener {
         int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         LWC lwc = LWC.getInstance();
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+        
+        // check if we can update this protection's id
+        if(protection != null && protection.getBlockId() == EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
+            int nid = EntityBlock.calcTypeId(entity);
+            if(nid != EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
+                protection.setBlockId(nid);
+                protection.save();
+            }
+        }
 
         if (damager instanceof Projectile) {
             ProjectileSource shooter = ((Projectile) damager).getShooter();
@@ -638,6 +647,16 @@ public class LWCPlayerListener implements Listener {
 
         LWC lwc = LWC.getInstance();
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+        
+        // check if we can update this protection's id
+        if(protection != null && protection.getBlockId() == EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
+            int nid = EntityBlock.calcTypeId(entity);
+            if(nid != EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
+                protection.setBlockId(nid);
+                protection.save();
+            }
+        }
+        
         Player p = e.getPlayer();
         boolean canAccess = lwc.canAccessProtection(p, protection);
         if (onPlayerEntityInteract(p, entity, true, e.isCancelled())) {
@@ -693,6 +712,15 @@ public class LWCPlayerListener implements Listener {
                 event.setCancelled(true);
             }
             return;
+        }
+        
+        // check if we can update this protection's id
+        if(protection != null && protection.getBlockId() == EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
+            int nid = EntityBlock.calcTypeId(entity);
+            if(nid != EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
+                protection.setBlockId(nid);
+                protection.save();
+            }
         }
 
         Player player = (Player) damager;
