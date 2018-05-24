@@ -1494,10 +1494,6 @@ public class LWC {
      * @return
      */
     public String resolveProtectionConfiguration(Block block, String node) {
-//		if(block.getTypeId() >= EntityBlock.ENTITY_BLOCK_ID) {
-//			EntityType et = EntityType.fromId(block.getTypeId() - EntityBlock.ENTITY_BLOCK_ID);
-//			return et == null ? null : resolveProtectionConfiguration(et, node);
-//		}
         if (block instanceof EntityBlock) {
             return resolveProtectionConfiguration(((EntityBlock) block).getEntityType(), node);
         }
