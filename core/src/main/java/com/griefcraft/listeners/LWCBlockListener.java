@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 public class LWCBlockListener implements Listener {
 
@@ -496,6 +497,26 @@ public class LWCBlockListener implements Listener {
             e.printStackTrace();
         }
     }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (!LWC.ENABLED) {
+            return;
+        }
+
+        LWC lwc = LWC.getInstance();
+
+        Block block = event.getBlock();
+        if (!lwc.isProtectable(block)) {
+            return;
+        }
+
+        Protection protection = lwc.findProtection(block);
+        if (protection != null) {
+            event.setCancelled(true);
+        }
+}
+    
 
     /**
      * Load and process the configuration
