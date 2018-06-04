@@ -282,6 +282,13 @@ public class LWCPlayerListener implements Listener {
         try {
             Set<String> actions = lwcPlayer.getActionNames();
             Protection protection = lwc.findProtection(block.getLocation());
+            
+            if (protection != null && !LWCBlockListener.blockMatches(protection.getBlockId(), block.getType())) {
+                // this block is no longer the block that's supposed to be protected
+                protection.remove();
+                return;
+            }
+        
             Module.Result result;
             boolean canAccess = lwc.canAccessProtection(player, protection);
 

@@ -190,6 +190,10 @@ public class LWCBlockListener implements Listener {
 
         if (protection == null) {
             return;
+        } else if (!blockMatches(protection.getBlockId(), block.getType())) {
+            // this block is no longer the block that's supposed to be protected
+            protection.remove();
+            return;
         }
 
         boolean canAccess = lwc.canAccessProtection(player, protection);
@@ -237,6 +241,46 @@ public class LWCBlockListener implements Listener {
             lwc.sendLocale(player, "protection.internalerror", "id", "BLOCK_BREAK");
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Check to see if the given block ID can match the material type <br> (some blocks have different IDs for state changes)
+     * @param blockID
+     * @param blockMat
+     * @return 
+     */
+    static boolean blockMatches(int blockID, Material blockMat) {
+        Material check = Material.getMaterial(blockID);
+        switch(check) {
+            case WATER:
+            case STATIONARY_WATER:
+                return blockMat == Material.WATER || blockMat == Material.STATIONARY_WATER;
+            case LAVA:
+            case STATIONARY_LAVA:
+                return blockMat == Material.LAVA || blockMat == Material.STATIONARY_LAVA;
+            case FURNACE:
+            case BURNING_FURNACE:
+                return blockMat == Material.FURNACE || blockMat == Material.BURNING_FURNACE;
+            case REDSTONE_ORE:
+            case GLOWING_REDSTONE_ORE:
+                return blockMat == Material.REDSTONE_ORE || blockMat == Material.GLOWING_REDSTONE_ORE;
+            case REDSTONE_TORCH_OFF:
+            case REDSTONE_TORCH_ON:
+                return blockMat == Material.REDSTONE_TORCH_ON || blockMat == Material.REDSTONE_TORCH_OFF;
+            case DIODE_BLOCK_OFF:
+            case DIODE_BLOCK_ON:
+                return blockMat == Material.DIODE_BLOCK_ON || blockMat == Material.DIODE_BLOCK_OFF;
+            case REDSTONE_LAMP_OFF:
+            case REDSTONE_LAMP_ON:
+                return blockMat == Material.REDSTONE_LAMP_ON || blockMat == Material.REDSTONE_LAMP_OFF;
+            case REDSTONE_COMPARATOR_OFF:
+            case REDSTONE_COMPARATOR_ON:
+                return blockMat == Material.REDSTONE_COMPARATOR_ON || blockMat == Material.REDSTONE_COMPARATOR_OFF;
+            case DAYLIGHT_DETECTOR:
+            case DAYLIGHT_DETECTOR_INVERTED:
+                return blockMat == Material.DAYLIGHT_DETECTOR || blockMat == Material.DAYLIGHT_DETECTOR_INVERTED;
+        }
+        return check != null && check == blockMat;
     }
 
     @EventHandler
