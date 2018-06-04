@@ -529,14 +529,18 @@ public class LWCPlayerListener implements Listener {
     }
 
     public static void onDamage(Entity entity, Entity damager, Cancellable event, boolean onBreak) {
-        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+        int hash = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         LWC lwc = LWC.getInstance();
-        Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
-        
+        Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), hash, hash, hash);
+        if (protection != null && protection.getWorld() == null) {
+            System.out.println("Correcting malformed protection: " + protection + " (fixing world)");
+            protection.setWorld(entity.getWorld().getName());
+        }
+
         // check if we can update this protection's id
-        if(protection != null && protection.getBlockId() == EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
+        if (protection != null && protection.getBlockId() == EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
             int nid = EntityBlock.calcTypeId(entity);
-            if(nid != EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
+            if (nid != EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
                 protection.setBlockId(nid);
                 protection.save();
             }

@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 public class Protection {
 
@@ -785,6 +786,7 @@ public class Protection {
      *
      * @return the ProtectionFinder used to create this protection
      */
+    @Nullable
     public ProtectionFinder getProtectionFinder() {
         return finder;
     }
@@ -919,6 +921,7 @@ public class Protection {
     /**
      * @return the Bukkit world the protection should be located in
      */
+    @Nullable
     public World getBukkitWorld() {
         if (world == null || world.isEmpty()) {
             return Bukkit.getServer().getWorlds().get(0);
@@ -930,13 +933,16 @@ public class Protection {
     /**
      * @return the Bukkit Player object of the owner
      */
+    @Nullable
     public Player getBukkitOwner() {
         return Bukkit.getServer().getPlayer(owner);
     }
 
     /**
-     * @return the block representing the protection in the world
+     * Gets the block in the world representing this protection.
+     * @return the block or null if the world does not exist
      */
+    @Nullable
     public Block getBlock() {
         if (cachedBlock != null) {
             return cachedBlock;
@@ -955,7 +961,7 @@ public class Protection {
     }
 
     /**
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

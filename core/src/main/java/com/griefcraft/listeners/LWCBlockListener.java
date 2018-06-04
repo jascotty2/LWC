@@ -28,6 +28,11 @@
 
 package com.griefcraft.listeners;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.griefcraft.cache.ProtectionCache;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
@@ -39,6 +44,7 @@ import com.griefcraft.scripting.event.LWCProtectionRegistrationPostEvent;
 import com.griefcraft.scripting.event.LWCRedstoneEvent;
 import com.griefcraft.util.Colors;
 import com.griefcraft.util.matchers.DoubleChestMatcher;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -47,24 +53,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockMultiPlaceEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.material.Hopper;
 import org.bukkit.material.MaterialData;
-import org.bukkit.material.PistonBaseMaterial;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 public class LWCBlockListener implements Listener {
 
@@ -76,7 +70,7 @@ public class LWCBlockListener implements Listener {
     /**
      * A set of blacklisted blocks
      */
-    private final Set<Integer> blacklistedBlocks = new HashSet<Integer>();
+    private final Set<MaterialData> blacklistedBlocks = new HashSet<>();
 
     public LWCBlockListener(LWCPlugin plugin) {
         this.plugin = plugin;
@@ -336,9 +330,9 @@ public class LWCBlockListener implements Listener {
         }
 
         // check if the block is blacklisted
-        boolean blockIsBlacklisted = blacklistedBlocks.contains(block.getTypeId()) || blacklistedBlocks.contains(hashCode(block.getTypeId(), block.getData()));
+        BlockState state = block.getState();
 
-        if (blockIsBlacklisted) {
+        if (blacklistedBlocks.contains(state.getData())) {
             // it's blacklisted, check for a protected chest
             for (Protection protection : lwc.findAdjacentProtectionsOnAllSides(block)) {
                 if (protection != null) {
@@ -392,7 +386,7 @@ public class LWCBlockListener implements Listener {
             }
             
             // also check if the hopper is pointing into a protection
-            Hopper hopperData = (Hopper) block.getState().getData();
+            Hopper hopperData = (Hopper) state.getData();
             Block target = block.getRelative(hopperData.getFacing());
             if (checkForHopperProtection(player, target)) {
                 event.setCancelled(true);
@@ -559,44 +553,29 @@ public class LWCBlockListener implements Listener {
         if (protection != null) {
             event.setCancelled(true);
         }
-}
-    
+    }
 
     /**
      * Load and process the configuration
      */
-    public void loadAndProcessConfig() {
-        List<String> ids = LWC.getInstance().getConfiguration().getStringList("optional.blacklistedBlocks", new ArrayList<String>());
+    private void loadAndProcessConfig() {
+        List<String> ids = LWC.getInstance().getConfiguration().getStringList("optional.blacklistedBlocks", new ArrayList<>());
 
         for (String sId : ids) {
-            String[] idParts = sId.trim().split(":");
+            try {
+                String[] idParts = sId.trim().split(":");
+                Material material = Material.matchMaterial(idParts[0].trim());
+                byte data = 0;
 
-            int id = Integer.parseInt(idParts[0].trim());
-            int data = 0;
+                if (idParts.length > 1) {
+                    data = Byte.parseByte(idParts[1].trim());
+                }
 
-            if (idParts.length > 1) {
-                data = Integer.parseInt(idParts[1].trim());
-            }
-
-            if (data == 0) {
-                blacklistedBlocks.add(id);
-            } else {
-                blacklistedBlocks.add(hashCode(id, data));
+                blacklistedBlocks.add(new MaterialData(material, data));
+            } catch (Exception ex) {
+                LWC.getInstance().log("Failed to parse \"" + sId + "\" from optional.blacklistedBlocks:");
+                ex.printStackTrace();
             }
         }
     }
-
-    /**
-     * Get the hashcode of two integers
-     *
-     * @param int1
-     * @param int2
-     * @return
-     */
-    private int hashCode(int int1, int int2) {
-        int hash = int1 * 17;
-        hash *= 37 + int2;
-        return hash;
-    }
-
 }
