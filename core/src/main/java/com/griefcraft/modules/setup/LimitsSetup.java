@@ -164,14 +164,6 @@ public class LimitsSetup extends JavaModule {
                         } else {
                             // it should be a material
                             Material material = Material.getMaterial(key.toUpperCase());
-
-                            // if it's null, try to parse it as a block value
-                            if (material == null) {
-                                try {
-                                    material = Material.getMaterial(Integer.parseInt(key));
-                                } catch (NumberFormatException e) { }
-                            }
-
                             if (material == null) {
                                 sender.sendMessage(Colors.Red + "Invalid material/block: \"" + value + "\"!");
                                 return;

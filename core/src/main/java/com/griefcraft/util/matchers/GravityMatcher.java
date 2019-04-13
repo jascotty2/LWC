@@ -45,19 +45,8 @@ public class GravityMatcher implements ProtectionFinder.Matcher {
     /**
      * Blocks that are destroyed if the land below them is destroyed
      */
-    public static final Set<Material> PROTECTABLES_POSTS = EnumSet.of(Material.SIGN_POST, Material.RAILS,
-            Material.POWERED_RAIL, Material.DETECTOR_RAIL, Material.LEVER, Material.STONE_BUTTON,
-            Material.WOOD_PLATE);
-
-    static {
-        // Add new materials by ID to maintain backwards compatibility
-        SetUtil.addToSetWithoutNull(PROTECTABLES_POSTS,
-                Material.getMaterial(176), // Standing banner
-                Material.getMaterial(143), // Wood button
-                Material.getMaterial(147), // Gold plate
-                Material.getMaterial(148) // Iron plate
-        );
-    }
+    public static final Set<Material> PROTECTABLES_POSTS = EnumSet.of(Material.SIGN, Material.RAIL,
+            Material.POWERED_RAIL, Material.DETECTOR_RAIL, Material.LEVER);
 
     public boolean matches(ProtectionFinder finder) {
         Block block = finder.getBaseBlock().getBlock();
@@ -68,7 +57,10 @@ public class GravityMatcher implements ProtectionFinder.Matcher {
             return true;
         }
 
-        if (PROTECTABLES_POSTS.contains(up.getType())) {
+        Material type = up.getType();
+        String name = type.name();
+        if (PROTECTABLES_POSTS.contains(type) || name.contains("PRESSURE_PLATE") || name.contains("BANNER")
+               || name.contains("BUTTON")) {
             finder.addBlock(up);
             return true;
         }

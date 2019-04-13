@@ -43,6 +43,7 @@ import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegistrationPostEvent;
 import com.griefcraft.scripting.event.LWCRedstoneEvent;
 import com.griefcraft.util.Colors;
+import com.griefcraft.util.LegacyMaterials;
 import com.griefcraft.util.matchers.DoubleChestMatcher;
 
 import org.bukkit.Material;
@@ -184,7 +185,7 @@ public class LWCBlockListener implements Listener {
 
         if (protection == null) {
             return;
-        } else if (!blockMatches(protection.getBlockId(), block.getType())) {
+        } else if (protection.getBlockType() != block.getType()) {
             // this block is no longer the block that's supposed to be protected
             protection.remove();
             return;
@@ -203,7 +204,7 @@ public class LWCBlockListener implements Listener {
                 // if they destroyed the protected block we want to move it aye?
                 if (lwc.blockEquals(protection.getBlock(), block)) {
                     // correct the block
-                    protection.setBlockId(doubleChest.getTypeId());
+                    protection.setBlockId(lwc.getPhysicalDatabase().getTypeId(block.getType()));
                     protection.setX(doubleChest.getX());
                     protection.setY(doubleChest.getY());
                     protection.setZ(doubleChest.getZ());
@@ -244,37 +245,7 @@ public class LWCBlockListener implements Listener {
      * @return 
      */
     static boolean blockMatches(int blockID, Material blockMat) {
-        Material check = Material.getMaterial(blockID);
-        switch(check) {
-            case WATER:
-            case STATIONARY_WATER:
-                return blockMat == Material.WATER || blockMat == Material.STATIONARY_WATER;
-            case LAVA:
-            case STATIONARY_LAVA:
-                return blockMat == Material.LAVA || blockMat == Material.STATIONARY_LAVA;
-            case FURNACE:
-            case BURNING_FURNACE:
-                return blockMat == Material.FURNACE || blockMat == Material.BURNING_FURNACE;
-            case REDSTONE_ORE:
-            case GLOWING_REDSTONE_ORE:
-                return blockMat == Material.REDSTONE_ORE || blockMat == Material.GLOWING_REDSTONE_ORE;
-            case REDSTONE_TORCH_OFF:
-            case REDSTONE_TORCH_ON:
-                return blockMat == Material.REDSTONE_TORCH_ON || blockMat == Material.REDSTONE_TORCH_OFF;
-            case DIODE_BLOCK_OFF:
-            case DIODE_BLOCK_ON:
-                return blockMat == Material.DIODE_BLOCK_ON || blockMat == Material.DIODE_BLOCK_OFF;
-            case REDSTONE_LAMP_OFF:
-            case REDSTONE_LAMP_ON:
-                return blockMat == Material.REDSTONE_LAMP_ON || blockMat == Material.REDSTONE_LAMP_OFF;
-            case REDSTONE_COMPARATOR_OFF:
-            case REDSTONE_COMPARATOR_ON:
-                return blockMat == Material.REDSTONE_COMPARATOR_ON || blockMat == Material.REDSTONE_COMPARATOR_OFF;
-            case DAYLIGHT_DETECTOR:
-            case DAYLIGHT_DETECTOR_INVERTED:
-                return blockMat == Material.DAYLIGHT_DETECTOR || blockMat == Material.DAYLIGHT_DETECTOR_INVERTED;
-        }
-        return check != null && check == blockMat;
+        return LWC.getInstance().getPhysicalDatabase().getType(blockID) == blockMat;
     }
 
     @EventHandler
@@ -357,7 +328,7 @@ public class LWCBlockListener implements Listener {
                             case LIME_SHULKER_BOX:
                             case PINK_SHULKER_BOX:
                             case GRAY_SHULKER_BOX:
-                            case SILVER_SHULKER_BOX:
+                            case LIGHT_GRAY_SHULKER_BOX:
                             case CYAN_SHULKER_BOX:
                             case PURPLE_SHULKER_BOX:
                             case BLUE_SHULKER_BOX:
@@ -416,7 +387,7 @@ public class LWCBlockListener implements Listener {
         LWC lwc = plugin.getLWC();
         Block block = event.getBlock();
 
-        if (block.getType() == Material.BED_BLOCK) {
+        if (block.getType().name().contains("BED")) {
             for (BlockState state : event.getReplacedBlockStates()) {
                 Protection protection = lwc.findProtection(state);
 
@@ -521,7 +492,7 @@ public class LWCBlockListener implements Listener {
             }
 
             // All good!
-            Protection protection = lwc.getPhysicalDatabase().registerProtection(block.getTypeId(), type, block.getWorld().getName(), player.getUniqueId().toString(), "", block.getX(), block.getY(), block.getZ());
+            Protection protection = lwc.getPhysicalDatabase().registerProtection(block.getType(), type, block.getWorld().getName(), player.getUniqueId().toString(), "", block.getX(), block.getY(), block.getZ());
 
             if (!Boolean.parseBoolean(lwc.resolveProtectionConfiguration(block, "quiet"))) {
                 lwc.sendLocale(player, "protection.onplace.create.finalize", "type", lwc.getPlugin().getMessageParser().parseMessage(autoRegisterType.toLowerCase()), "block", LWC.materialToString(block));

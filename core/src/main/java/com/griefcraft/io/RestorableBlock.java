@@ -30,6 +30,8 @@ package com.griefcraft.io;
 
 import com.griefcraft.bukkit.EntityBlock;
 import com.griefcraft.lwc.LWC;
+import com.griefcraft.util.LegacyMaterials;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -107,8 +109,9 @@ public class RestorableBlock implements Restorable {
                 Block block = bworld.getBlockAt(x, y, z);
 
                 // Begin screwing with shit :p
-                block.setTypeId(id);
-                block.setData((byte) data);
+                block.setType(lwc.getPhysicalDatabase().getType(id));
+                block.getState().setRawData((byte) data);
+                block.getState().update();
 
                 if (items.size() > 0) {
                     if (!(block.getState() instanceof InventoryHolder)) {
@@ -147,7 +150,7 @@ public class RestorableBlock implements Restorable {
         }
 
         RestorableBlock rblock = new RestorableBlock();
-        rblock.id = block.getTypeId();
+        rblock.id = LWC.getInstance().getPhysicalDatabase().getTypeId(block.getType());
         rblock.world = block.getWorld().getName();
         rblock.x = block.getX();
         rblock.y = block.getY();

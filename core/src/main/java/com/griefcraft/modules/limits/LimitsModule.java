@@ -145,7 +145,7 @@ public class LimitsModule extends JavaModule {
 
         switch (type) {
             case CUSTOM:
-                protections = lwc.getPhysicalDatabase().getProtectionCount(player.getName(), block.getTypeId());
+                protections = lwc.getPhysicalDatabase().getProtectionCount(player.getName(), block.getType());
                 break;
 
             case DEFAULT:
@@ -223,19 +223,12 @@ public class LimitsModule extends JavaModule {
             return globalLimit;
         }
 
-        int blockId = block.getTypeId();
         int blockLimit;
         // Try the block id now
         if (block instanceof EntityBlock) {
             blockLimit = searchPermissionsForInteger(player, PERMISSION_NODE_ENTITY + ((EntityBlock) block).getEntityType().toString().toLowerCase() + ".");
-            if (blockLimit == -1) {
-                blockLimit = searchPermissionsForInteger(player, PERMISSION_NODE_ENTITY + blockId + ".");
-            }
         } else {
             blockLimit = searchPermissionsForInteger(player, PERMISSION_NODE_BLOCK + block.getType().toString().toLowerCase() + ".");
-            if (blockLimit == -1) {
-                blockLimit = searchPermissionsForInteger(player, PERMISSION_NODE_BLOCK + blockId + ".");
-            }
         }
 
         if (blockLimit != -1) {
@@ -250,10 +243,10 @@ public class LimitsModule extends JavaModule {
 
             case CUSTOM:
                 // first try the block id
-                limit = resolveInteger(player, blockId + "");
+                // limit = resolveInteger(player, blockId + "");
 
                 // and now try the name
-                if (limit == -1 && blockId > 0) {
+                if (limit == -1 && block.getType() != Material.AIR) {
                     String name;
                     if (block instanceof EntityBlock) {
                         name = ((EntityBlock) block).getEntityType().toString().toLowerCase();

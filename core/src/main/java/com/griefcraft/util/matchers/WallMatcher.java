@@ -59,10 +59,6 @@ public class WallMatcher implements ProtectionFinder.Matcher {
      */
     public static final BlockFace[] POSSIBLE_FACES = new BlockFace[]{ BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 
-    static {
-        SetUtil.addToSetWithoutNull(PROTECTABLES_WALL, Material.getMaterial(177)); // Wall banner
-    }
-
     public boolean matches(ProtectionFinder finder) {
         // The block we are working on
         Block block = finder.getBaseBlock().getBlock();
@@ -97,7 +93,7 @@ public class WallMatcher implements ProtectionFinder.Matcher {
         byte direction = block.getData();
 
         // Blocks such as wall signs
-        if (PROTECTABLES_WALL.contains(block.getType())) {
+        if (PROTECTABLES_WALL.contains(block.getType()) || block.getType().name().contains("WALL_BANNER")) {
             byte EAST = 0x05;
             byte WEST = 0x04;
             byte SOUTH = 0x03;

@@ -32,11 +32,8 @@ import com.griefcraft.bukkit.EntityBlock;
 import com.griefcraft.cache.ProtectionCache;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.event.LWCProtectionRemovePostEvent;
-import com.griefcraft.util.Colors;
-import com.griefcraft.util.ProtectionFinder;
-import com.griefcraft.util.StringUtil;
-import com.griefcraft.util.TimeUtil;
-import com.griefcraft.util.UUIDRegistry;
+import com.griefcraft.util.*;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -611,18 +608,7 @@ public class Protection {
             return false;
         }
 
-        switch (block.getType()) {
-            case FURNACE:
-            case BURNING_FURNACE:
-                return blockId == Material.FURNACE.getId() || blockId == Material.BURNING_FURNACE.getId();
-
-            case STEP:
-            case DOUBLE_STEP:
-                return blockId == Material.STEP.getId() || blockId == Material.DOUBLE_STEP.getId();
-
-            default:
-                return blockId == block.getTypeId();
-        }
+        return getBlockType() == block.getType();
     }
 
     public JSONObject getData() {
@@ -631,6 +617,10 @@ public class Protection {
 
     public int getBlockId() {
         return blockId;
+    }
+
+    public Material getBlockType() {
+        return LWC.getInstance().getPhysicalDatabase().getType(blockId);
     }
 
     public String getPassword() {

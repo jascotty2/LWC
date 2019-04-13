@@ -30,6 +30,8 @@ package com.griefcraft.migration;
 
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.modules.pluginsupport.WorldGuard;
+import com.griefcraft.util.LegacyMaterials;
+
 import org.bukkit.Material;
 
 import java.io.File;
@@ -114,7 +116,8 @@ public class ConfigPost300 implements MigrationUtility {
 
                 // if it's an int, convert it
                 if (blockId > 0) {
-                    protection = Material.getMaterial(blockId).toString().toLowerCase().replaceAll("block", "");
+                    Material material = LegacyMaterials.getNewMaterial(blockId);
+                    protection = material.toString().toLowerCase().replaceAll("block", "");
 
                     if (protection.endsWith("_")) {
                         protection = protection.substring(0, protection.length() - 1);

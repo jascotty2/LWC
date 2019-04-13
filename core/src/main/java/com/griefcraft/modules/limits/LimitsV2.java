@@ -242,13 +242,13 @@ public class LimitsV2 extends JavaModule {
         @Override
         public int getProtectionCount(Player player) {
             LWC lwc = LWC.getInstance();
-            return lwc.getPhysicalDatabase().getProtectionCount(player.getName(), Material.SIGN_POST.getId())
-                    + lwc.getPhysicalDatabase().getProtectionCount(player.getName(), Material.WALL_SIGN.getId());
+            return lwc.getPhysicalDatabase().getProtectionCount(player.getName(), Material.SIGN)
+                    + lwc.getPhysicalDatabase().getProtectionCount(player.getName(), Material.WALL_SIGN);
         }
 
         @Override
         public boolean accepts(String type) {
-            return Material.SIGN_POST.toString().equalsIgnoreCase(type)
+            return Material.SIGN.toString().equalsIgnoreCase(type)
                     || Material.WALL_SIGN.toString().equalsIgnoreCase(type);
         }
 

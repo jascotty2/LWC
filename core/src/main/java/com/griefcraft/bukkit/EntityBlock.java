@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -87,7 +88,6 @@ public class EntityBlock implements Block {
         return typID <= 0 ? UNKNOWN_ENTITY_BLOCK_ID : typID + ENTITY_BLOCK_ID;
     }
 
-    @Override
     public int getTypeId() {
         // don't accidentally shoot ourselves in the foot
         final int typID = entity.getType().getTypeId();
@@ -140,8 +140,20 @@ public class EntityBlock implements Block {
         return null;
     }
 
+    public void setBlockData(BlockData data) {
+
+    }
+
+    public void setBlockData(BlockData data, boolean applyPhysics) {
+
+    }
+
     public byte getData() {
         return 0;
+    }
+
+    public BlockData getBlockData() {
+        return null;
     }
 
     public Collection<ItemStack> getDrops() {

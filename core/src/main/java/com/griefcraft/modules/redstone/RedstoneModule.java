@@ -55,7 +55,7 @@ public class RedstoneModule extends JavaModule {
 
         if (finder != null) {
             for (BlockState found : finder.getBlocks()) {
-                if (found.getType() == Material.STONE_PLATE || found.getType() == Material.WOOD_PLATE) {
+                if (found.getType().name().contains("PRESSURE_PLATE")) {
                     // find a player that is using it
                     int x = found.getX();
                     int y = found.getY();

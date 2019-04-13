@@ -146,7 +146,7 @@ public class AdminRebuild extends JavaModule {
             }
 
             // Create the protection!
-            Protection protection = lwc.getPhysicalDatabase().registerProtection(block.getTypeId(), Protection.Type.PRIVATE,
+            Protection protection = lwc.getPhysicalDatabase().registerProtection(block.getType(), Protection.Type.PRIVATE,
                     block.getWorld().getName(), creator, "", x, y, z);
 
             if (protection == null) {

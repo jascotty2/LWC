@@ -163,7 +163,7 @@ public class LWCEntityListener implements Listener {
             (inHand.getType() == Material.ARMOR_STAND
              || inHand.getType() == Material.MINECART
              || inHand.getType() == Material.HOPPER_MINECART
-             || inHand.getType() == Material.STORAGE_MINECART)) {
+             || inHand.getType() == Material.CHEST_MINECART)) {
             // actual location of an armor stand is x+0.5 z+0.5 from the air block coords
             // minecarts spawn at y+0.0625, though
             final Location l = event.getClickedBlock().getRelative(inHand.getType() == Material.ARMOR_STAND ? event.getBlockFace() : BlockFace.SELF).getLocation();
