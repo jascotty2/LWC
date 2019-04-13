@@ -200,7 +200,7 @@ public class DoorsModule extends JavaModule {
      */
     private void changeDoorStates(boolean allowDoorToOpen, Block... doors) {
         for (Block door : doors) {
-            if (door == null) {
+            if (door == null || !(door.getBlockData() instanceof Door)) {
                 continue;
             }
 
@@ -213,11 +213,11 @@ public class DoorsModule extends JavaModule {
             Block topHalf = door.getRelative(BlockFace.UP);
             if (topHalf.getBlockData() instanceof Door) {
                 Door topData = (Door) topHalf.getBlockData();
-                topData.setOpen(true);
+                topData.setOpen(!data.isOpen());
                 topHalf.setBlockData(topData);
             }
 
-            data.setOpen(true);
+            data.setOpen(!data.isOpen());
             door.setBlockData(data);
 
             // Play the door open/close sound
