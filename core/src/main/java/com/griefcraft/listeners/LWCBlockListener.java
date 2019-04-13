@@ -536,6 +536,19 @@ public class LWCBlockListener implements Listener {
             try {
                 String[] idParts = sId.trim().split(":");
                 Material material = Material.matchMaterial(idParts[0].trim());
+				if(material == null && idParts[0].trim().matches("^[0-9]+$")) {
+					int id = Integer.parseInt(idParts[0].trim());
+					for(Material mat : Material.values()) {
+						if(mat.getId() == id) {
+							material = mat;
+							break;
+						}
+					}
+				}
+				if(material == null) {
+					continue;
+				}
+
                 byte data = 0;
 
                 if (idParts.length > 1) {

@@ -473,7 +473,7 @@ public class PhysDB extends Database {
         if (databaseVersion == 4) {
             List<String> blacklistedBlocks = lwc.getConfiguration().getStringList("optional.blacklistedBlocks", new ArrayList<String>());
 
-            if (!blacklistedBlocks.contains("154")) {
+            if (!blacklistedBlocks.contains("" + Material.HOPPER.getId())) {
                 blacklistedBlocks.add(Integer.toString(Material.HOPPER.getId()));
                 lwc.getConfiguration().setProperty("optional.blacklistedBlocks", blacklistedBlocks);
                 lwc.getConfiguration().save();
