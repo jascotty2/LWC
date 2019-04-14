@@ -473,15 +473,15 @@ public class PhysDB extends Database {
         if (databaseVersion == 4) {
             List<String> blacklistedBlocks = lwc.getConfiguration().getStringList("optional.blacklistedBlocks", new ArrayList<String>());
 
-            if (!blacklistedBlocks.contains("154")) {
-                blacklistedBlocks.add(Integer.toString(Material.HOPPER.getId()));
+            if (!blacklistedBlocks.contains("hopper")) {
+                blacklistedBlocks.add("hopper");
                 lwc.getConfiguration().setProperty("optional.blacklistedBlocks", blacklistedBlocks);
                 lwc.getConfiguration().save();
                 Configuration.reload();
 
                 lwc.log("Added Hoppers to Blacklisted Blocks in core.yml (optional.blacklistedBlocks)");
                 lwc.log("This means that Hoppers CANNOT be placed around protections a player does not have access to");
-                lwc.log("If you DO NOT want this feature, simply remove " + Material.HOPPER.getId() + " (Hoppers) from blacklistedBlocks :-)");
+                lwc.log("If you DO NOT want this feature, simply remove \"hopper\" from blacklistedBlocks :-)");
             }
 
             incrementDatabaseVersion();
