@@ -673,7 +673,8 @@ public class LWC {
             return true;
         }
 
-        int legacyId = LWC.getInstance().getPhysicalDatabase().getTypeId(block.getType());
+        int legacyId = block instanceof EntityBlock ? ((EntityBlock) block).getTypeId() :
+				LWC.getInstance().getPhysicalDatabase().getTypeId(block.getType());
 
         // support for old protection dbs that do not contain the block id
         if (protection.getBlockId() <= 0 && legacyId != protection.getBlockId()) {
