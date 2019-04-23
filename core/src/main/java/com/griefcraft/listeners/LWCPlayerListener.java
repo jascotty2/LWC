@@ -418,6 +418,7 @@ public class LWCPlayerListener implements Listener {
         // Location of the container
         Location location;
         InventoryHolder holder = null;
+		boolean holderIsEntity = false;
 
         try {
             holder = event.getInventory().getHolder();
@@ -435,6 +436,7 @@ public class LWCPlayerListener implements Listener {
             } else if (holder instanceof DoubleChest) {
                 location = ((DoubleChest) holder).getLocation();
             } else if (holder instanceof Minecart) {
+				holderIsEntity = true;
                 Minecart m = (Minecart) holder;
                 int A = EntityBlock.calcHash(m.getUniqueId().hashCode());
                 location = new Location(m.getWorld(), A, A, A);
@@ -496,8 +498,10 @@ public class LWCPlayerListener implements Listener {
             }
         }
 
-        // Attempt to load the protection at that location
-        Protection protection = lwc.findProtection(location);
+		// Attempt to load the protection at that location
+		Protection protection = holderIsEntity
+				? lwc.getPhysicalDatabase().loadProtection(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ())
+				: lwc.findProtection(location);
 
         // If no protection was found we can safely ignore it
         if (protection == null) {
