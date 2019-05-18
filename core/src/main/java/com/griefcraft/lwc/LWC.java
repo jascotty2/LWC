@@ -1194,7 +1194,7 @@ public class LWC {
     public Protection findProtection(Location location) {
         String cacheKey = protectionCache.cacheKey(location);
 
-        if (protectionCache.isKnownNull(cacheKey)) {System.out.println("null known at " + location);
+        if (protectionCache.isKnownNull(cacheKey)) {
             return null;
         }
 
