@@ -61,9 +61,9 @@ public class CreateModule extends JavaModule {
         Player player = event.getPlayer();
 
         if (protection.isOwner(player)) {
-            lwc.sendLocale(player, "protection.interact.error.alreadyregistered", "block", LWC.materialToString(protection.getBlockId()));
+            lwc.sendLocale(player, "protection.interact.error.alreadyregistered", "block", LWC.materialToString(protection.getBlock()));
         } else {
-            lwc.sendLocale(player, "protection.interact.error.notowner", "block", LWC.materialToString(protection.getBlockId()));
+            lwc.sendLocale(player, "protection.interact.error.notowner", "block", LWC.materialToString(protection.getBlock()));
         }
 
         lwc.removeModes(player);
