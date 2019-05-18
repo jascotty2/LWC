@@ -258,7 +258,7 @@ public class LWCEntityListener implements Listener {
 
             int hash = EntityBlock.calcHash(entity.getUniqueId().hashCode());
             Protection protection = lwc.getPhysicalDatabase().registerProtection(
-                    EntityBlock.ENTITY_BLOCK_ID + entity.getType().getTypeId(), type,
+                    EntityBlock.calcTypeString(entity), type,
                     entity.getWorld().getName(),
                     player.getUniqueId().toString(), "", hash, hash, hash);
 

@@ -282,13 +282,13 @@ public class LWCPlayerListener implements Listener {
         try {
             Set<String> actions = lwcPlayer.getActionNames();
             Protection protection = lwc.findProtection(block.getLocation());
-            
-            if (protection != null && protection.getBlockType() != block.getType()) {
+
+            if (protection != null && protection.getBlock().getType() != protection.getBlockType()) {
                 // this block is no longer the block that's supposed to be protected
                 protection.remove();
                 return;
             }
-        
+
             Module.Result result;
             boolean canAccess = lwc.canAccessProtection(player, protection);
 
@@ -542,10 +542,10 @@ public class LWCPlayerListener implements Listener {
         }
 
         // check if we can update this protection's id
-        if (protection != null && protection.getBlockId() == EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
-            int nid = EntityBlock.calcTypeId(entity);
-            if (nid != EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
-                protection.setBlockId(nid);
+        if (protection != null && protection.getBlockTypeString().equals(EntityBlock.UNKNOWN_ENTITY_TYPE)) {
+            final String nid = EntityBlock.calcTypeString(entity);
+            if (!nid.equals(EntityBlock.UNKNOWN_ENTITY_TYPE)) {
+                protection.setBlockType(nid);
                 protection.save();
             }
         }
@@ -664,10 +664,10 @@ public class LWCPlayerListener implements Listener {
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
         
         // check if we can update this protection's id
-        if(protection != null && protection.getBlockId() == EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
-            int nid = EntityBlock.calcTypeId(entity);
-            if(nid != EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
-                protection.setBlockId(nid);
+        if(protection != null && protection.getBlockTypeString().equals(EntityBlock.UNKNOWN_ENTITY_TYPE)) {
+            final String nid = EntityBlock.calcTypeString(entity);
+            if(nid.equals(EntityBlock.UNKNOWN_ENTITY_TYPE)) {
+                protection.setBlockType(nid);
                 protection.save();
             }
         }
@@ -730,10 +730,10 @@ public class LWCPlayerListener implements Listener {
         }
         
         // check if we can update this protection's id
-        if(protection != null && protection.getBlockId() == EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
-            int nid = EntityBlock.calcTypeId(entity);
-            if(nid != EntityBlock.UNKNOWN_ENTITY_BLOCK_ID) {
-                protection.setBlockId(nid);
+        if(protection != null && protection.getBlockTypeString().equals(EntityBlock.UNKNOWN_ENTITY_TYPE)) {
+            final String nid = EntityBlock.calcTypeString(entity);
+            if(nid.equals(EntityBlock.UNKNOWN_ENTITY_TYPE)) {
+                protection.setBlockType(nid);
                 protection.save();
             }
         }
