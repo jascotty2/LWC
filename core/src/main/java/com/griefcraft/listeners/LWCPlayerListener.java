@@ -532,9 +532,15 @@ public class LWCPlayerListener implements Listener {
         onDamage(event.getVehicle(), event.getAttacker(), event, false);
     }
 
-    public static void onDamage(Entity entity, Entity damager, Cancellable event, boolean onBreak) {
+    private void onDamage(Entity entity, Entity damager, Cancellable event, boolean onBreak) {
+        if (!LWC.ENABLED) {
+            return;
+        }
         int hash = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         LWC lwc = LWC.getInstance();
+        if (!lwc.isProtectable(entity.getType())) {
+            return; // don't check not protectable entities to improve performance of damage events
+        }
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), hash, hash, hash);
         if (protection != null && protection.getWorld() == null) {
             System.out.println("Correcting malformed protection: " + protection + " (fixing world)");
@@ -593,9 +599,17 @@ public class LWCPlayerListener implements Listener {
 
     @EventHandler
     public void onMinecartBreak(VehicleDestroyEvent event) {
+        if (!LWC.ENABLED) {
+            return;
+        }
+
         Entity entity = event.getVehicle();
-        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         LWC lwc = LWC.getInstance();
+        if (!lwc.isProtectable(entity.getType())) {
+            return; // don't check not protectable entities to improve performance of damage events
+        }
+
+        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
 
         Entity breaksource = event.getAttacker();
@@ -642,10 +656,17 @@ public class LWCPlayerListener implements Listener {
 
     @EventHandler
     public void hangingBreak(HangingBreakEvent event) {
-        Entity entity = event.getEntity();
-        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+        if (!LWC.ENABLED) {
+            return;
+        }
 
+        Entity entity = event.getEntity();
         LWC lwc = LWC.getInstance();
+        if (!lwc.isProtectable(entity.getType())) {
+            return; // don't check not protectable entities to improve performance of damage events
+        }
+
+        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
         if (protection != null) {
             if (event.getCause() == RemoveCause.PHYSICS
@@ -657,10 +678,17 @@ public class LWCPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
-        Entity entity = e.getRightClicked();
-        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+        if (!LWC.ENABLED) {
+            return;
+        }
 
+        Entity entity = e.getRightClicked();
         LWC lwc = LWC.getInstance();
+        if (!lwc.isProtectable(entity.getType())) {
+            return; // don't check not protectable entities to improve performance of damage events
+        }
+
+        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
         
         // check if we can update this protection's id
@@ -687,14 +715,21 @@ public class LWCPlayerListener implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent e) {
+        if (!LWC.ENABLED) {
+            return;
+        }
+
         if (e instanceof EntityDamageByEntityEvent
                 && !(e.getCause() == DamageCause.BLOCK_EXPLOSION || e.getCause() == DamageCause.ENTITY_EXPLOSION)) {
             return; // handle this separately
         }
         Entity entity = e.getEntity();
-        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
-
         LWC lwc = LWC.getInstance();
+        if (!lwc.isProtectable(entity.getType())) {
+            return; // don't check not protectable entities to improve performance of damage events
+        }
+
+        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
         if (protection != null) {
             if (e.getCause() != DamageCause.CONTACT) {
@@ -705,12 +740,19 @@ public class LWCPlayerListener implements Listener {
 
     @EventHandler
     public void itemFrameItemRemoval(EntityDamageByEntityEvent event) {
+        if (!LWC.ENABLED) {
+            return;
+        }
+
         Entity entity = event.getEntity();
         if (entity instanceof Player) {
             return;
         }
-        Entity damager = event.getDamager();
         LWC lwc = LWC.getInstance();
+        if (!lwc.isProtectable(entity.getType())) {
+            return; // don't check not protectable entities to improve performance of damage events
+        }
+        Entity damager = event.getDamager();
         int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
         if (protection != null && damager instanceof Projectile) {
@@ -819,8 +861,11 @@ public class LWCPlayerListener implements Listener {
         }
 
         LWC lwc = LWC.getInstance();
-        Player player = event.getPlayer();
+        if (!lwc.isProtectable(entity.getType())) {
+            return; // don't check not protectable entities to improve performance of damage events
+        }
 
+        Player player = event.getPlayer();
         if (((entity instanceof ItemFrame) || (entity instanceof ArmorStand)) && lwc.isProtectable(entity.getType())) {
             // Prevent players with lwc.deny from interacting with blocks that have an inventory
             if (!lwc.hasPermission(player, "lwc.protect") && lwc.hasPermission(player, "lwc.deny") && !lwc.isAdmin(player) && !lwc.isMod(player)) {
@@ -844,10 +889,9 @@ public class LWCPlayerListener implements Listener {
         InventoryHolder holder = event.getInventory().getHolder();
         if (!(holder instanceof Minecart)) {
             return;
-        }
-        Entity entity = (Entity) holder;
+		}
 
-        if (onPlayerEntityInteract((Player) event.getPlayer(), entity, true, event.isCancelled())) {
+        if (onPlayerEntityInteract((Player) event.getPlayer(), (Entity) holder, true, event.isCancelled())) {
             event.setCancelled(true);
         }
     }
@@ -861,8 +905,11 @@ public class LWCPlayerListener implements Listener {
      * @param cancelled
      * @return true if interaction is not allowed
      */
-    public static boolean onPlayerEntityInteract(Player player, Entity entity, boolean rightClick, boolean cancelled) {
+    private boolean onPlayerEntityInteract(Player player, Entity entity, boolean rightClick, boolean cancelled) {
         LWC lwc = LWC.getInstance();
+        if (!lwc.isProtectable(entity.getType())) {
+            return false; // don't check not protectable entities to improve performance of damage events
+        }
         LWCPlayer lwcPlayer = lwc.wrapPlayer(player);
         int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
