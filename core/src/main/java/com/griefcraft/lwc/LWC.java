@@ -356,9 +356,6 @@ public class LWC {
      * @return
      */
     public static Block findAdjacentDoubleChest(Block block) {
-        if (!DoubleChestMatcher.PROTECTABLES_CHESTS.contains(block.getType())) {
-            throw new UnsupportedOperationException("findAdjacentDoubleChest() cannot be called on a: " + block.getType());
-        }
         final BlockData d = block.getBlockData();
         if (d instanceof Chest) {
             final Chest c = (Chest) d;
