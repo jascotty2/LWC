@@ -68,6 +68,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -386,6 +387,26 @@ public class LWCPlayerListener implements Listener {
             e.printStackTrace();
         }
     }
+	
+    @EventHandler(ignoreCancelled = true)
+    public void onTakeLecternBook(PlayerTakeLecternBookEvent event) {
+		if (!LWC.ENABLED) {
+            return;
+        }
+
+        final LWC lwc = plugin.getLWC();
+
+		final Block b = event.getLectern().getBlock();
+		final Protection protection = lwc.findProtection(b.getLocation());
+		if(protection != null) {
+			final Player player = event.getPlayer();
+
+			// Can they admin it? (remove items/etc)
+			if (!lwc.canAdminProtection(player, protection)) {
+				event.setCancelled(true);
+			}
+		}
+	}
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
@@ -508,7 +529,7 @@ public class LWCPlayerListener implements Listener {
             return;
         }
 
-        // If it's not a donation chest, ignore if
+        // If it's not a donation chest, ignore it
         if (protection.getType() != Protection.Type.DONATION) {
             return;
         }
