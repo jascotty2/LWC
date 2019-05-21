@@ -509,8 +509,7 @@ public class LWCBlockListener implements Listener {
 				if(material == null) {
 					continue;
 				}
-
-                blacklistedBlocks.add(material);
+            blacklistedBlocks.add(material);
             } catch (Exception ex) {
                 LWC.getInstance().log("Failed to parse \"" + sId + "\" from optional.blacklistedBlocks:");
                 ex.printStackTrace();
