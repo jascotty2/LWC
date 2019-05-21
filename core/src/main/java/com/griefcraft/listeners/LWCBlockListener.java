@@ -395,6 +395,9 @@ public class LWCBlockListener implements Listener {
         Protection current = lwc.findProtection(block.getLocation());
         if (current != null && current.getX() == block.getX() && current.getZ() == block.getZ()) {
             // no use checking if the block id matches.
+            // except for an odd glitch with lecterns.
+            if(block.getType().name().equals("LECTERN") && current.getBlockType().name().equals("LECTERN"))
+                return;
             // This is a build event because it didn't exist before, and does now
             //lwc.log("Removing corrupted protection: " + current);
             current.remove();
