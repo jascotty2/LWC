@@ -37,6 +37,7 @@ import com.griefcraft.model.Protection;
 import com.griefcraft.scripting.Module;
 import com.griefcraft.scripting.event.LWCBlockInteractEvent;
 import com.griefcraft.scripting.event.LWCDropItemEvent;
+import com.griefcraft.scripting.event.LWCEntityInteractEvent;
 import com.griefcraft.scripting.event.LWCProtectionDestroyEvent;
 import com.griefcraft.scripting.event.LWCProtectionInteractEvent;
 import com.griefcraft.util.UUIDRegistry;
@@ -982,7 +983,7 @@ public class LWCPlayerListener implements Listener {
 
                 result = evt.getResult();
             } else {
-                LWCBlockInteractEvent evt = new LWCBlockInteractEvent(fakeEvent, fakeBlock, actions);
+                LWCEntityInteractEvent evt = new LWCEntityInteractEvent(fakeEvent, entity, actions);
                 lwc.getModuleLoader().dispatchEvent(evt);
 
                 result = evt.getResult();

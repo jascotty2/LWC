@@ -1367,6 +1367,20 @@ public class LWC {
         return Boolean.parseBoolean(resolveProtectionConfiguration(block, "enabled"));
     }
 
+
+    /**
+     * Check a block to see if it is protectable
+     *
+	 * @param entity
+     * @return
+     */
+    public boolean isProtectable(Entity entity) {
+        if (entity == null) {
+            return false;
+        } 
+		return Boolean.parseBoolean(resolveProtectionConfiguration(entity.getType(), "enabled"));
+    }
+
     /**
      * Check a block to see if it is protectable
      *

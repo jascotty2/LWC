@@ -28,6 +28,7 @@
 
 package com.griefcraft.modules.create;
 
+import com.griefcraft.bukkit.EntityBlock;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.model.Action;
 import com.griefcraft.model.LWCPlayer;
@@ -35,6 +36,7 @@ import com.griefcraft.model.Protection;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCBlockInteractEvent;
 import com.griefcraft.scripting.event.LWCCommandEvent;
+import com.griefcraft.scripting.event.LWCEntityInteractEvent;
 import com.griefcraft.scripting.event.LWCProtectionInteractEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegistrationPostEvent;
@@ -42,6 +44,7 @@ import com.griefcraft.sql.PhysDB;
 import com.griefcraft.util.StringUtil;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class CreateModule extends JavaModule {
@@ -138,6 +141,89 @@ public class CreateModule extends JavaModule {
             case "donation":
                 String[] rights = protectionData.split(" ");
                 protection = physDb.registerProtection(block.getType(), Protection.Type.matchType(protectionType), worldName, player.getUniqueId().toString(), "", blockX, blockY, blockZ);
+                lwc.sendLocale(player, "protection.interact.create.finalize");
+                lwc.processRightsModifications(player, protection, rights);
+        }
+
+        // tell the modules that a protection was registered
+        if (protection != null) {
+            // Fix the blocks that match it
+            protection.removeCache();
+            LWC.getInstance().getProtectionCache().addProtection(protection);
+
+            lwc.getModuleLoader().dispatchEvent(new LWCProtectionRegistrationPostEvent(protection));
+        }
+
+        event.setResult(Result.CANCEL);
+    }
+
+    @Override
+    public void onEntityInteract(LWCEntityInteractEvent event) {
+        if (event.getResult() != Result.DEFAULT) {
+            return;
+        }
+
+        if (!event.hasAction("create")) {
+            return;
+        }
+
+        LWC lwc = event.getLWC();
+        Entity entity = event.getEntity();
+        LWCPlayer player = lwc.wrapPlayer(event.getPlayer());
+
+        if (!lwc.isProtectable(entity)) {
+            return;
+        }
+
+        PhysDB physDb = lwc.getPhysicalDatabase();
+
+        Action action = player.getAction("create");
+        String actionData = action.getData();
+        String[] split = actionData.split(" ");
+        String protectionType = split[0].toLowerCase();
+        String protectionData = StringUtil.join(split, 1);
+
+        // check permissions again (DID THE LITTLE SHIT MOVE WORLDS??!?!?!?!?!?)
+        if (!lwc.hasPermission(event.getPlayer(), "lwc.create." + protectionType, "lwc.create", "lwc.protect")) {
+            lwc.sendLocale(player, "protection.accessdenied");
+            lwc.removeModes(player);
+            event.setResult(Result.CANCEL);
+            return;
+        }
+
+        // misc data we'll use later
+        String worldName = entity.getWorld().getName();
+		EntityBlock eb = new EntityBlock(entity);
+        int hash = eb.getX();
+
+        lwc.removeModes(player);
+        LWCProtectionRegisterEvent evt = new LWCProtectionRegisterEvent(player.getBukkitPlayer(), eb);
+        lwc.getModuleLoader().dispatchEvent(evt);
+
+        // another plugin cancelled the registration
+        if (evt.isCancelled()) {
+            return;
+        }
+
+        // The created protection
+        Protection protection = null;
+
+        switch (protectionType) {
+            case "public":
+                protection = physDb.registerProtection(EntityBlock.calcTypeString(entity), Protection.Type.PUBLIC, worldName, player.getUniqueId().toString(), "", hash, hash, hash);
+                lwc.sendLocale(player, "protection.interact.create.finalize");
+                break;
+            case "password":
+                String password = lwc.encrypt(protectionData);
+                protection = physDb.registerProtection(EntityBlock.calcTypeString(entity), Protection.Type.PASSWORD, worldName, player.getUniqueId().toString(), password, hash, hash, hash);
+                player.addAccessibleProtection(protection);
+                lwc.sendLocale(player, "protection.interact.create.finalize");
+                lwc.sendLocale(player, "protection.interact.create.password");
+                break;
+            case "private":
+            case "donation":
+                String[] rights = protectionData.split(" ");
+                protection = physDb.registerProtection(EntityBlock.calcTypeString(entity), Protection.Type.matchType(protectionType), worldName, player.getUniqueId().toString(), "", hash, hash, hash);
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 lwc.processRightsModifications(player, protection, rights);
         }
