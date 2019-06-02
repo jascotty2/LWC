@@ -49,6 +49,7 @@ import com.griefcraft.util.UUIDRegistry;
 import com.griefcraft.util.config.Configuration;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONArray;
@@ -1202,12 +1203,17 @@ public class PhysDB extends Database {
         return protections;
     }
 
+    public Protection registerProtection(Entity entity, Protection.Type type, String player, String data) {
+        final int hash = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+        return registerProtection(EntityBlock.calcTypeString(entity), type, entity.getWorld().getName(), player, data, hash, hash, hash);
+    }
+    
     public Protection registerProtection(Material blockType, Protection.Type type, String world, String player, String data, int x, int y, int z) {
         return registerProtection(blockType.name(), type, world, player, data, x, y, z);
     }
 
-    public Protection registerProtection(EntityType entity, Protection.Type type, String world, String player, String data, int x, int y, int z) {
-        return registerProtection(EntityBlock.calcTypeString(entity), type, world, player, data, x, y, z);
+    public Protection registerProtection(EntityType entity, Protection.Type type, String world, String player, String data, int hash) {
+        return registerProtection(EntityBlock.calcTypeString(entity), type, world, player, data, hash, hash, hash);
     }
 
     protected Protection registerProtection(String blockType, Protection.Type type, String world, String player, String data, int x, int y, int z) {

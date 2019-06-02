@@ -192,9 +192,7 @@ public class CreateModule extends JavaModule {
         }
 
         // misc data we'll use later
-        String worldName = entity.getWorld().getName();
 		EntityBlock eb = new EntityBlock(entity);
-        int hash = eb.getX();
 
         lwc.removeModes(player);
         LWCProtectionRegisterEvent evt = new LWCProtectionRegisterEvent(player.getBukkitPlayer(), eb);
@@ -210,12 +208,12 @@ public class CreateModule extends JavaModule {
 
         switch (protectionType) {
             case "public":
-                protection = physDb.registerProtection(entity.getType(), Protection.Type.PUBLIC, worldName, player.getUniqueId().toString(), "", hash, hash, hash);
+                protection = physDb.registerProtection(entity, Protection.Type.PUBLIC, player.getUniqueId().toString(), "");
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 break;
             case "password":
                 String password = lwc.encrypt(protectionData);
-                protection = physDb.registerProtection(entity.getType(), Protection.Type.PASSWORD, worldName, player.getUniqueId().toString(), password, hash, hash, hash);
+                protection = physDb.registerProtection(entity, Protection.Type.PASSWORD, player.getUniqueId().toString(), password);
                 player.addAccessibleProtection(protection);
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 lwc.sendLocale(player, "protection.interact.create.password");
@@ -223,7 +221,7 @@ public class CreateModule extends JavaModule {
             case "private":
             case "donation":
                 String[] rights = protectionData.split(" ");
-                protection = physDb.registerProtection(entity.getType(), Protection.Type.matchType(protectionType), worldName, player.getUniqueId().toString(), "", hash, hash, hash);
+                protection = physDb.registerProtection(entity, Protection.Type.matchType(protectionType), player.getUniqueId().toString(), "");
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 lwc.processRightsModifications(player, protection, rights);
         }
