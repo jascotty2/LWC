@@ -99,7 +99,7 @@ public class RestorableProtection implements Restorable {
 
     public void restore() {
         LWC lwc = LWC.getInstance();
-        Protection protection = lwc.getPhysicalDatabase().registerProtection(blockTypeStr, Protection.Type.values()[protectionType],
+        Protection protection = lwc.getPhysicalDatabase().registerProtection(blockType, Protection.Type.values()[protectionType],
                 world, owner, data, x, y, z);
         // TODO fix the ID?
     }
@@ -145,6 +145,7 @@ public class RestorableProtection implements Restorable {
         this.id = id;
     }
 
+    @Override
     public Material getBlockType() {
         return blockType;
     }

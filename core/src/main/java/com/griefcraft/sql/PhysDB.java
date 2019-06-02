@@ -32,9 +32,7 @@ import com.griefcraft.bukkit.EntityBlock;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import com.griefcraft.cache.LRUCache;
@@ -50,7 +48,6 @@ import com.griefcraft.scripting.Module;
 import com.griefcraft.util.UUIDRegistry;
 import com.griefcraft.util.config.Configuration;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -1209,8 +1206,11 @@ public class PhysDB extends Database {
         return registerProtection(blockType.name(), type, world, player, data, x, y, z);
     }
 
-    @Deprecated
-    public Protection registerProtection(String blockType, Protection.Type type, String world, String player, String data, int x, int y, int z) {
+    public Protection registerProtection(EntityType entity, Protection.Type type, String world, String player, String data, int x, int y, int z) {
+        return registerProtection(EntityBlock.calcTypeString(entity), type, world, player, data, x, y, z);
+    }
+
+    protected Protection registerProtection(String blockType, Protection.Type type, String world, String player, String data, int x, int y, int z) {
         ProtectionCache cache = LWC.getInstance().getProtectionCache();
 
         try {

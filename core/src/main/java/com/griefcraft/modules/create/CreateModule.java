@@ -210,12 +210,12 @@ public class CreateModule extends JavaModule {
 
         switch (protectionType) {
             case "public":
-                protection = physDb.registerProtection(EntityBlock.calcTypeString(entity), Protection.Type.PUBLIC, worldName, player.getUniqueId().toString(), "", hash, hash, hash);
+                protection = physDb.registerProtection(entity.getType(), Protection.Type.PUBLIC, worldName, player.getUniqueId().toString(), "", hash, hash, hash);
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 break;
             case "password":
                 String password = lwc.encrypt(protectionData);
-                protection = physDb.registerProtection(EntityBlock.calcTypeString(entity), Protection.Type.PASSWORD, worldName, player.getUniqueId().toString(), password, hash, hash, hash);
+                protection = physDb.registerProtection(entity.getType(), Protection.Type.PASSWORD, worldName, player.getUniqueId().toString(), password, hash, hash, hash);
                 player.addAccessibleProtection(protection);
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 lwc.sendLocale(player, "protection.interact.create.password");
@@ -223,7 +223,7 @@ public class CreateModule extends JavaModule {
             case "private":
             case "donation":
                 String[] rights = protectionData.split(" ");
-                protection = physDb.registerProtection(EntityBlock.calcTypeString(entity), Protection.Type.matchType(protectionType), worldName, player.getUniqueId().toString(), "", hash, hash, hash);
+                protection = physDb.registerProtection(entity.getType(), Protection.Type.matchType(protectionType), worldName, player.getUniqueId().toString(), "", hash, hash, hash);
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 lwc.processRightsModifications(player, protection, rights);
         }
