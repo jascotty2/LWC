@@ -633,7 +633,7 @@ public class LWC {
         }
 
         String blockType = block instanceof EntityBlock ? ((EntityBlock) block).getTypeString() :
-				block.getType().name();
+                block.getType().name();
 
         // support for old protection dbs that do not contain the block id
         if (protection.getBlockTypeString() == null && blockType != null) {
@@ -1078,8 +1078,8 @@ public class LWC {
                             .append(protectionId);
                     deleteHistoryQuery.append("UPDATE ").append(prefix)
                             .append("history SET status = ")
-									 .append(String.valueOf(History.Status.INACTIVE.ordinal()))
-									 .append(" WHERE protectionId IN(").append(protectionId);
+                                     .append(String.valueOf(History.Status.INACTIVE.ordinal()))
+                                     .append(" WHERE protectionId IN(").append(protectionId);
                 } else {
                     deleteProtectionsQuery.append(",").append(protectionId);
                     deleteHistoryQuery.append(",").append(protectionId);
@@ -1371,14 +1371,14 @@ public class LWC {
     /**
      * Check a block to see if it is protectable
      *
-	 * @param entity
+     * @param entity
      * @return
      */
     public boolean isProtectable(Entity entity) {
         if (entity == null) {
             return false;
         } 
-		return Boolean.parseBoolean(resolveProtectionConfiguration(entity.getType(), "enabled"));
+        return Boolean.parseBoolean(resolveProtectionConfiguration(entity.getType(), "enabled"));
     }
 
     /**
@@ -1491,7 +1491,11 @@ public class LWC {
         }
 
         if (materialName.contains("_")) { // Prefix wildcarding for shulker boxes & gates
-            names.add("*_" + materialName.substring(materialName.indexOf("_") + 1));
+            int i = materialName.indexOf("_") + 1;
+            while(i > 0) {
+                names.add("*_" + materialName.substring(i));
+                i = materialName.indexOf("_", i) + 1;
+            }
         }
 
         String value = configuration.getString("protections." + node);

@@ -290,6 +290,10 @@ public class LWCBlockListener implements Listener {
                             case DROPPER:
                             case BREWING_STAND:
                             case FURNACE:
+                            case BLAST_FURNACE:
+                            case SMOKER:
+                            case BARREL:
+                            case SHULKER_BOX:
                             case WHITE_SHULKER_BOX:
                             case ORANGE_SHULKER_BOX:
                             case MAGENTA_SHULKER_BOX:
@@ -497,18 +501,18 @@ public class LWCBlockListener implements Listener {
             try {
                 String[] idParts = sId.trim().split(":");
                 Material material = Material.matchMaterial(idParts[0].trim());
-				if(material == null && idParts[0].trim().matches("^[0-9]+$")) {
-					int id = Integer.parseInt(idParts[0].trim());
-					for(Material mat : Material.values()) {
-						if(mat.getId() == id) {
-							material = mat;
-							break;
-						}
-					}
-				}
-				if(material == null) {
-					continue;
-				}
+                if(material == null && idParts[0].trim().matches("^[0-9]+$")) {
+                    int id = Integer.parseInt(idParts[0].trim());
+                    for(Material mat : Material.values()) {
+                        if(mat.getId() == id) {
+                            material = mat;
+                            break;
+                        }
+                    }
+                }
+                if(material == null) {
+                    continue;
+                }
             blacklistedBlocks.add(material);
             } catch (Exception ex) {
                 LWC.getInstance().log("Failed to parse \"" + sId + "\" from optional.blacklistedBlocks:");
