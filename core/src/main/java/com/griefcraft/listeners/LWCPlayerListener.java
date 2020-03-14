@@ -554,6 +554,13 @@ public class LWCPlayerListener implements Listener {
         onDamage(event.getVehicle(), event.getAttacker(), event, false);
     }
 
+    @EventHandler
+    public void onEntityDamageByExplosion(EntityDamageEvent event) {
+        if(event.getCause() == DamageCause.BLOCK_EXPLOSION || event.getCause() == DamageCause.ENTITY_EXPLOSION) {
+            onDamage(event.getEntity(), null, event, false);
+        }
+    }
+
     private void onDamage(Entity entity, Entity damager, Cancellable event, boolean onBreak) {
         if (!LWC.ENABLED) {
             return;
