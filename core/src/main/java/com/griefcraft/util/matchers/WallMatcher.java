@@ -34,6 +34,7 @@ import org.bukkit.block.BlockFace;
 
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.FaceAttachable;
 import org.bukkit.block.data.type.Switch;
 
 /**
@@ -73,8 +74,12 @@ public class WallMatcher implements ProtectionFinder.Matcher {
      */
     private Block getAttachedTo(Block block) {
         final BlockData d = block.getBlockData();
-        if (d instanceof Switch && ((Switch) d).getFace() != Switch.Face.WALL) {
+		// Paper 1.16 breaks this:
+        /*if (d instanceof Switch && ((Switch) d).getFace() != Switch.Face.WALL) {
             return block.getRelative(((Switch) d).getFace() == Switch.Face.FLOOR ? BlockFace.DOWN : BlockFace.UP);
+        } else */
+		if (d instanceof FaceAttachable && ((FaceAttachable) d).getAttachedFace() != FaceAttachable.AttachedFace.WALL) {
+            return block.getRelative(((FaceAttachable) d).getAttachedFace() == FaceAttachable.AttachedFace.FLOOR ? BlockFace.DOWN : BlockFace.UP);
         } else if (d instanceof Directional) {
             return block.getRelative(((Directional) d).getFacing().getOppositeFace());
         }

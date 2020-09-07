@@ -278,4 +278,14 @@ public class EntityBlock implements Block {
     public BoundingBox getBoundingBox() {
         return null;
     }
+
+	@Override
+	public boolean applyBoneMeal(BlockFace arg0) {
+		return false;
+	}
+
+	@Override
+	public Collection<ItemStack> getDrops(ItemStack arg0, Entity arg1) {
+		return null;
+	}
 }
