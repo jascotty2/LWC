@@ -33,6 +33,7 @@ import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
 import com.griefcraft.model.Flag;
 import com.griefcraft.model.LWCPlayer;
+import com.griefcraft.model.Permission;
 import com.griefcraft.model.Protection;
 import com.griefcraft.scripting.Module;
 import com.griefcraft.scripting.event.LWCBlockInteractEvent;
@@ -537,6 +538,11 @@ public class LWCPlayerListener implements Listener {
 
         // Can they admin it? (remove items/etc)
         boolean canAdmin = lwc.canAdminProtection(player, protection);
+
+        // allow ACL users to edit donation chests
+        if (!canAdmin) {
+            canAdmin = protection.getAccess(player.getUniqueId().toString(), Permission.Type.PLAYER) == Permission.Access.PLAYER;
+        }
 
         // nope.avi
         if (!canAdmin) {
