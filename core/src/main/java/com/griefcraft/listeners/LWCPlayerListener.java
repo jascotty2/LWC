@@ -705,7 +705,8 @@ public class LWCPlayerListener implements Listener {
         Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
         if (protection != null) {
             if (event.getCause() == RemoveCause.PHYSICS
-                    || event.getCause() == RemoveCause.EXPLOSION) {
+                    || event.getCause() == RemoveCause.EXPLOSION
+                    || event.getCause() == RemoveCause.OBSTRUCTION) {
                 event.setCancelled(true);
             }
         }
