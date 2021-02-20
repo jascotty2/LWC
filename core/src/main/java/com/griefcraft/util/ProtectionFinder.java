@@ -392,7 +392,6 @@ public class ProtectionFinder {
         // go through the blocks
         for (int index = 1; index < size; index++) {
             BlockState state = blocks.get(index);
-
             if (lwc.isProtectable(state)) {
                 protectables.add(state);
             }

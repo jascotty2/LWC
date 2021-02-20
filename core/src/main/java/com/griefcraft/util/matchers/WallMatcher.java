@@ -35,7 +35,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.FaceAttachable;
-import org.bukkit.block.data.type.Switch;
 
 /**
  * Matches wall entities
@@ -57,7 +56,7 @@ public class WallMatcher implements ProtectionFinder.Matcher {
             Block face = block.getRelative(blockFace);
             Block matched = getAttachedTo(face);
             if(matched != null && matched.getX() == block.getX() && matched.getY() == block.getY() && matched.getZ() == block.getZ()) {
-                finder.addBlock(matched);
+                finder.addBlock(face);
                 return true;
             }
         }
