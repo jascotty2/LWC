@@ -64,7 +64,7 @@ public class LWCBlockListener implements Listener {
     /**
      * The plugin instance
      */
-    private LWCPlugin plugin;
+    private final LWCPlugin plugin;
 
     /**
      * A set of blacklisted blocks
@@ -348,7 +348,7 @@ public class LWCBlockListener implements Listener {
                 boolean denyHoppers = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(block, "denyHoppers"));
                 if (!lwc.canAccessProtection(player, protection) || (denyHoppers != protection.hasFlag(Flag.Type.HOPPER) && !lwc.canAdminProtection(player, protection))) {
                     // player can't access the protection and hoppers aren't enabled for it
-                    lwc.enforceAccess(player, protection, block, false);
+                    lwc.enforceAccess(player, protection, block, false, true);
                     return true;
                 }
             }

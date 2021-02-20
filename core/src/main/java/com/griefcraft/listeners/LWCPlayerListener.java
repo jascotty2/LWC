@@ -90,6 +90,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import org.bukkit.inventory.EquipmentSlot;
 
 public class LWCPlayerListener implements Listener {
 
@@ -261,6 +262,10 @@ public class LWCPlayerListener implements Listener {
             return;
         }
 
+        // This event can sometimes be thrown twice (for the main hand and offhand), and while we need to check both
+        // for protection access, we want to avoid doing duplicate work (throwing events, printing messages, etc).
+        boolean usingMainHand = event.getHand() == EquipmentSlot.HAND;
+
         Block block = event.getClickedBlock();
         BlockState state;
 
@@ -276,7 +281,9 @@ public class LWCPlayerListener implements Listener {
         // Prevent players with lwc.deny from interacting with blocks that have an inventory
         if (state instanceof InventoryHolder && lwc.isProtectable(block)) {
             if (!lwc.hasPermission(player, "lwc.protect") && lwc.hasPermission(player, "lwc.deny") && !lwc.isAdmin(player) && !lwc.isMod(player)) {
-                lwc.sendLocale(player, "protection.interact.error.blocked");
+                if (usingMainHand) {
+					lwc.sendLocale(player, "protection.interact.error.blocked");
+				}
                 event.setCancelled(true);
                 return;
             }
@@ -295,87 +302,91 @@ public class LWCPlayerListener implements Listener {
             Module.Result result;
             boolean canAccess = lwc.canAccessProtection(player, protection);
 
-            // Calculate if the player has a pending action (i.e any action besides 'interacted')
-            int actionCount = actions.size();
-            boolean hasInteracted = actions.contains("interacted");
-            boolean hasPendingAction = (hasInteracted && actionCount > 1) || (!hasInteracted && actionCount > 0);
+			if(usingMainHand) {
+				result = Module.Result.DEFAULT;
+			} else {
+				if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+					boolean ignoreLeftClick = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(block, "ignoreLeftClick"));
 
-            if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                boolean ignoreLeftClick = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(block, "ignoreLeftClick"));
+					if (ignoreLeftClick) {
+						return;
+					}
+				} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+					boolean ignoreRightClick = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(block, "ignoreRightClick"));
 
-                if (ignoreLeftClick) {
-                    return;
-                }
-            } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                boolean ignoreRightClick = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(block, "ignoreRightClick"));
+					if (ignoreRightClick) {
+						return;
+					}
+				}
 
-                if (ignoreRightClick) {
-                    return;
-                }
-            }
+				// Calculate if the player has a pending action (i.e any action besides 'interacted')
+				int actionCount = actions.size();
+				boolean hasInteracted = actions.contains("interacted");
+				boolean hasPendingAction = (hasInteracted && actionCount > 1) || (!hasInteracted && actionCount > 0);
 
-            // If the event was cancelled and they have an action, warn them
-            if (event.isCancelled()) {
-                // only send it if a non-"interacted" action is set which is always set on the player
-                if (hasPendingAction) {
-                    lwc.sendLocale(player, "lwc.pendingaction");
-                }
+				// If the event was cancelled and they have an action, warn them
+				if (event.isCancelled()) {
+					// only send it if a non-"interacted" action is set which is always set on the player
+					if (hasPendingAction) {
+						lwc.sendLocale(player, "lwc.pendingaction");
+					}
 
-                // it's cancelled, do not continue !
-                return;
-            }
+					// it's cancelled, do not continue !
+					return;
+				}
 
-            // register in an action what protection they interacted with (if applicable.)
-            if (protection != null) {
-                com.griefcraft.model.Action action = new com.griefcraft.model.Action();
-                action.setName("interacted");
-                action.setPlayer(lwcPlayer);
-                action.setProtection(protection);
+				// register in an action what protection they interacted with (if applicable.)
+				if (protection != null) {
+					com.griefcraft.model.Action action = new com.griefcraft.model.Action();
+					action.setName("interacted");
+					action.setPlayer(lwcPlayer);
+					action.setProtection(protection);
 
-                lwcPlayer.addAction(action);
-            }
+					lwcPlayer.addAction(action);
+				}
 
-            // events are only used when they already have an action pending
-            boolean canAdmin = lwc.canAdminProtection(player, protection);
+				// events are only used when they already have an action pending
+				boolean canAdmin = lwc.canAdminProtection(player, protection);
 
-            if (protection != null) {
-                LWCProtectionInteractEvent evt = new LWCProtectionInteractEvent(event, protection, actions, canAccess, canAdmin);
-                lwc.getModuleLoader().dispatchEvent(evt);
+				if (protection != null) {
+					LWCProtectionInteractEvent evt = new LWCProtectionInteractEvent(event, protection, actions, canAccess, canAdmin);
+					lwc.getModuleLoader().dispatchEvent(evt);
 
-                result = evt.getResult();
-            } else {
-                LWCBlockInteractEvent evt = new LWCBlockInteractEvent(event, block, actions);
-                lwc.getModuleLoader().dispatchEvent(evt);
+					result = evt.getResult();
+				} else {
+					LWCBlockInteractEvent evt = new LWCBlockInteractEvent(event, block, actions);
+					lwc.getModuleLoader().dispatchEvent(evt);
 
-                result = evt.getResult();
-            }
+					result = evt.getResult();
+				}
 
-            if (result == Module.Result.ALLOW) {
-                return;
-            }
+				if (result == Module.Result.ALLOW) {
+					return;
+				}
 
-            // optional.onlyProtectIfOwnerIsOnline
-            if (protection != null && !canAccess && lwc.getConfiguration().getBoolean("optional.onlyProtectWhenOwnerIsOnline", false)) {
-                Player owner = protection.getBukkitOwner();
+				// optional.onlyProtectIfOwnerIsOnline
+				if (protection != null && !canAccess && lwc.getConfiguration().getBoolean("optional.onlyProtectWhenOwnerIsOnline", false)) {
+					Player owner = protection.getBukkitOwner();
 
-                // If they aren't online, allow them in :P
-                if (owner == null || !owner.isOnline()) {
-                    return;
-                }
-            }
+					// If they aren't online, allow them in :P
+					if (owner == null || !owner.isOnline()) {
+						return;
+					}
+				}
 
-            // optional.onlyProtectIfOwnerIsOffline
-            if (protection != null && !canAccess && lwc.getConfiguration().getBoolean("optional.onlyProtectWhenOwnerIsOffline", false)) {
-                Player owner = protection.getBukkitOwner();
+				// optional.onlyProtectIfOwnerIsOffline
+				if (protection != null && !canAccess && lwc.getConfiguration().getBoolean("optional.onlyProtectWhenOwnerIsOffline", false)) {
+					Player owner = protection.getBukkitOwner();
 
-                // If they aren't online, allow them in :P
-                if (owner != null && owner.isOnline()) {
-                    return;
-                }
-            }
+					// If they aren't online, allow them in :P
+					if (owner != null && owner.isOnline()) {
+						return;
+					}
+				}
+			}
 
             if (result == Module.Result.DEFAULT) {
-                canAccess = lwc.enforceAccess(player, protection, block, canAccess);
+                canAccess = lwc.enforceAccess(player, protection, block, canAccess, usingMainHand);
             }
 
             if (!canAccess || result == Module.Result.CANCEL) {

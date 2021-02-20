@@ -623,9 +623,11 @@ public class LWC {
      * @param player
      * @param protection
      * @param block
+     * @param hasAccess
+     * @param notice     Should this method print a notice to the player? (some events may call this several times)
      * @return true if the player was granted access
      */
-    public boolean enforceAccess(Player player, Protection protection, Block block, boolean hasAccess) {
+    public boolean enforceAccess(Player player, Protection protection, Block block, boolean hasAccess, boolean notice) {
         MessageParser parser = plugin.getMessageParser();
 
         if (block == null || protection == null) {
@@ -658,7 +660,7 @@ public class LWC {
             }
         }
 
-        boolean permShowNotices = hasPermission(player, "lwc.shownotices");
+        boolean permShowNotices = notice && hasPermission(player, "lwc.shownotices");
         if ((permShowNotices && configuration.getBoolean("core.showNotices", true))
                 && !Boolean.parseBoolean(resolveProtectionConfiguration(block, "quiet"))) {
             boolean isOwner = protection.isOwner(player);
@@ -712,7 +714,7 @@ public class LWC {
      * @return true if the player was granted access
      */
     public boolean enforceAccess(Player player, Protection protection, Entity entity, boolean hasAccess) {
-        return enforceAccess(player, protection, new EntityBlock(entity), hasAccess);
+        return enforceAccess(player, protection, new EntityBlock(entity), hasAccess, true);
     }
 
     /**
