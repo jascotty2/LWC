@@ -130,11 +130,9 @@ public class LWCPlayer implements CommandSender {
         return player.getName();
     }
 
-    //@Override
-    //public Spigot spigot()
-    //{
-    //    return player.spigot();
-    //}
+    public CommandSender.Spigot spigot() {
+        return player.spigot();
+    }
 
     /**
      * Enable a mode on the player
