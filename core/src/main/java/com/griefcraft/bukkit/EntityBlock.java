@@ -199,7 +199,7 @@ public class EntityBlock implements Block {
     }
 
     public Location getLocation() {
-        return null;
+        return entity != null ? entity.getLocation() : null;
     }
 
     public Location getLocation(Location arg0) {
