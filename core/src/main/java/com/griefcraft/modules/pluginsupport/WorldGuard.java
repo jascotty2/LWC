@@ -346,7 +346,7 @@ public class WorldGuard extends JavaModule {
         List<String> regions = regionManager.getApplicableRegionsIDs(vector);
 
         // Are they not in a region, and it's blocked there?
-        if (regions.size() == 0) {
+        if (regions.isEmpty()) {
             if (!configuration.getBoolean("worldguard.allowProtectionsOutsideRegions", true)) {
                 lwc.sendLocale(player, "lwc.worldguard.notallowed");
                 event.setCancelled(true);
