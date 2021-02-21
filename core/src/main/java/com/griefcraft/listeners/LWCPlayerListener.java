@@ -302,7 +302,7 @@ public class LWCPlayerListener implements Listener {
             Module.Result result;
             boolean canAccess = lwc.canAccessProtection(player, protection);
 
-			if(usingMainHand) {
+			if(!usingMainHand) {
 				result = Module.Result.DEFAULT;
 			} else {
 				if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
@@ -348,13 +348,14 @@ public class LWCPlayerListener implements Listener {
 				// events are only used when they already have an action pending
 				boolean canAdmin = lwc.canAdminProtection(player, protection);
 
-				if (protection != null) {
-					LWCProtectionInteractEvent evt = new LWCProtectionInteractEvent(event, protection, actions, canAccess, canAdmin);
+				// allow changing the protection type
+				if (protection == null || (actions.contains("create") && protection.isOwner(player))) {
+					LWCBlockInteractEvent evt = new LWCBlockInteractEvent(event, block, actions);
 					lwc.getModuleLoader().dispatchEvent(evt);
 
 					result = evt.getResult();
 				} else {
-					LWCBlockInteractEvent evt = new LWCBlockInteractEvent(event, block, actions);
+					LWCProtectionInteractEvent evt = new LWCProtectionInteractEvent(event, protection, actions, canAccess, canAdmin);
 					lwc.getModuleLoader().dispatchEvent(evt);
 
 					result = evt.getResult();
@@ -1002,17 +1003,18 @@ public class LWCPlayerListener implements Listener {
                             : org.bukkit.event.block.Action.LEFT_CLICK_BLOCK,
                     null, fakeBlock, null);
 
-            if (protection != null) {
-                LWCProtectionInteractEvent evt = new LWCProtectionInteractEvent(fakeEvent, protection, actions, canAccess, canAdmin);
-                lwc.getModuleLoader().dispatchEvent(evt);
+			// allow changing the protection type
+			if (protection == null || (actions.contains("create") && protection.isOwner(player))) {
+				LWCEntityInteractEvent evt = new LWCEntityInteractEvent(fakeEvent, entity, actions);
+				lwc.getModuleLoader().dispatchEvent(evt);
 
-                result = evt.getResult();
-            } else {
-                LWCEntityInteractEvent evt = new LWCEntityInteractEvent(fakeEvent, entity, actions);
-                lwc.getModuleLoader().dispatchEvent(evt);
+				result = evt.getResult();
+			} else {
+				LWCProtectionInteractEvent evt = new LWCProtectionInteractEvent(fakeEvent, protection, actions, canAccess, canAdmin);
+				lwc.getModuleLoader().dispatchEvent(evt);
 
-                result = evt.getResult();
-            }
+				result = evt.getResult();
+			}
 
             if (result == Module.Result.ALLOW) {
                 return false;

@@ -123,16 +123,24 @@ public class CreateModule extends JavaModule {
         }
 
         // The created protection
-        Protection protection = null;
+        Protection protection = lwc.findProtection(block);
+		if(protection != null) {
+			protection.remove();
+			protection = null;
+		}
 
         switch (protectionType) {
             case "public":
-                protection = physDb.registerProtection(block.getType(), Protection.Type.PUBLIC, worldName, player.getUniqueId().toString(), "", blockX, blockY, blockZ);
+                protection = physDb.registerProtection(block.getType(), 
+						Protection.Type.PUBLIC, worldName, player.getUniqueId().toString(), 
+						"", blockX, blockY, blockZ);
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 break;
             case "password":
                 String password = lwc.encrypt(protectionData);
-                protection = physDb.registerProtection(block.getType(), Protection.Type.PASSWORD, worldName, player.getUniqueId().toString(), password, blockX, blockY, blockZ);
+                protection = physDb.registerProtection(block.getType(), 
+						Protection.Type.PASSWORD, worldName, player.getUniqueId().toString(), 
+						password, blockX, blockY, blockZ);
                 player.addAccessibleProtection(protection);
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 lwc.sendLocale(player, "protection.interact.create.password");
@@ -140,7 +148,9 @@ public class CreateModule extends JavaModule {
             case "private":
             case "donation":
                 String[] rights = protectionData.split(" ");
-                protection = physDb.registerProtection(block.getType(), Protection.Type.matchType(protectionType), worldName, player.getUniqueId().toString(), "", blockX, blockY, blockZ);
+                protection = physDb.registerProtection(block.getType(), 
+						Protection.Type.matchType(protectionType), worldName, player.getUniqueId().toString(), 
+						"", blockX, blockY, blockZ);
                 lwc.sendLocale(player, "protection.interact.create.finalize");
                 lwc.processRightsModifications(player, protection, rights);
         }
@@ -204,7 +214,12 @@ public class CreateModule extends JavaModule {
         }
 
         // The created protection
-        Protection protection = null;
+        int A = EntityBlock.calcHash(entity.getUniqueId().hashCode());
+        Protection protection = lwc.getPhysicalDatabase().loadProtection(entity.getWorld().getName(), A, A, A);
+		if(protection != null) {
+			protection.remove();
+			protection = null;
+		}
 
         switch (protectionType) {
             case "public":
