@@ -64,13 +64,13 @@ public class WallMatcher implements ProtectionFinder.Matcher {
         return false;
     }
 
-//    /**
-//     * Try and match a wall block
-//     *
-//     * @param block
-//     * @param matchingFace
-//     * @return
-//     */
+    /**
+     * Try and match a wall block
+     *
+     * @param block
+     * @param matchingFace
+     * @return
+     */
     private Block getAttachedTo(Block block) {
         final BlockData d = block.getBlockData();
 		// Paper 1.16 breaks this:

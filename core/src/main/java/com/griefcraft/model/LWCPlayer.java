@@ -139,7 +139,7 @@ public class LWCPlayer implements CommandSender {
      */
     @Override
     public Spigot spigot() {
-        return null;
+        return player.spigot();
     }
 
     /**
