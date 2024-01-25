@@ -497,17 +497,20 @@ public class PhysDB extends Database {
         }
 
         if (databaseVersion == 4) {
-            List<String> blacklistedBlocks = lwc.getConfiguration().getStringList("optional.blacklistedBlocks", new ArrayList());
+            List<String> blacklistedBlocks = lwc.getConfiguration().getStringList("optional.blacklistedBlocks",
+                    new ArrayList<String>());
 
             if (!blacklistedBlocks.contains("hopper")) {
-                blacklistedBlocks.add("hopper");
+                blacklistedBlocks.add(Material.HOPPER.name().toLowerCase());
                 lwc.getConfiguration().setProperty("optional.blacklistedBlocks", blacklistedBlocks);
                 lwc.getConfiguration().save();
                 Configuration.reload();
 
                 lwc.log("Added Hoppers to Blacklisted Blocks in core.yml (optional.blacklistedBlocks)");
                 lwc.log("This means that Hoppers CANNOT be placed around protections a player does not have access to");
-                lwc.log("If you DO NOT want this feature, simply remove \"hopper\" from blacklistedBlocks :-)");
+                lwc.log("If you DO NOT want this feature, simply remove '" + Material.HOPPER.name().toLowerCase()
+                        + "' from blacklistedBlocks :-)");
+                lwc.log("Also consider enabling optional.alternativeHopperProtection for more efficient hopper protection, or if you plan on protecting hoppers themselves.");
             }
 
             incrementDatabaseVersion();
@@ -517,7 +520,7 @@ public class PhysDB extends Database {
             boolean foundTrappedChest = false;
 
             for (String key : lwc.getConfiguration().getNode("protections.blocks").getKeys(null)) {
-                if (key.equalsIgnoreCase("trapped_chest") || key.equals(Integer.toString(Material.TRAPPED_CHEST.getId()))) {
+                if (key.equalsIgnoreCase("trapped_chest")) {
                     foundTrappedChest = true;
                     break;
                 }

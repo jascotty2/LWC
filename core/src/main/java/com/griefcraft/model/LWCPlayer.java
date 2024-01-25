@@ -61,22 +61,22 @@ public class LWCPlayer implements CommandSender {
     /**
      * Cache of LWCPlayer objects
      */
-    private final static Map<Player, LWCPlayer> playerCache = new HashMap<Player, LWCPlayer>();
+    private final static Map<Player, LWCPlayer> playerCache = new HashMap<>();
 
     /**
      * The map of actions the player has
      */
-    private final Map<String, Action> actions = new HashMap<String, Action>();
+    private final Map<String, Action> actions = new HashMap<>();
 
     /**
      * The set of modes the player has
      */
-    private final Set<Mode> modes = new HashSet<Mode>();
+    private final Set<Mode> modes = new HashSet<>();
 
     /**
      * The set of protections the player can access
      */
-    private final Set<Protection> accessibleProtections = new HashSet<Protection>();
+    private final Set<Protection> accessibleProtections = new HashSet<>();
 
     public LWCPlayer(LWC lwc, Player player) {
         this.lwc = lwc;
@@ -103,6 +103,8 @@ public class LWCPlayer implements CommandSender {
      * @param player
      */
     public static void removePlayer(Player player) {
+        getPlayer(player);
+
         // uncache them
         playerCache.remove(player);
     }
@@ -130,8 +132,14 @@ public class LWCPlayer implements CommandSender {
         return player.getName();
     }
 
-    public CommandSender.Spigot spigot() {
-        return player.spigot();
+    /**
+     * Required by Spigot for plugin compilation.
+     *
+     * @return
+     */
+    @Override
+    public Spigot spigot() {
+        return null;
     }
 
     /**
@@ -156,8 +164,6 @@ public class LWCPlayer implements CommandSender {
 
     /**
      * Disable all modes enabled by the player
-     *
-     * @return
      */
     public void disableAllModes() {
         modes.clear();
@@ -343,7 +349,7 @@ public class LWCPlayer implements CommandSender {
      * @return
      */
     public List<History> getRelatedHistory(History.Type type) {
-        List<History> related = new ArrayList<History>();
+        List<History> related = new ArrayList<>();
 
         for (History history : getRelatedHistory()) {
             if (history.getType() == type) {
@@ -362,6 +368,16 @@ public class LWCPlayer implements CommandSender {
         for (String _s : s) {
             sendMessage(_s);
         }
+    }
+
+    @Override
+    public void sendMessage(UUID uuid, String s) {
+        player.sendMessage(player.getUniqueId(), s);
+    }
+
+    @Override
+    public void sendMessage(UUID uuid, String[] strings) {
+        player.sendMessage(player.getUniqueId(), strings);
     }
 
     public Server getServer() {

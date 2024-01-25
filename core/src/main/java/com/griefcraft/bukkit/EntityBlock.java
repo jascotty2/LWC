@@ -14,12 +14,14 @@ import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.bukkit.util.VoxelShape;
 
 public class EntityBlock implements Block {
 	
@@ -279,7 +281,17 @@ public class EntityBlock implements Block {
         return null;
     }
 
-	@Override
+    @Override
+    public VoxelShape getCollisionShape() {
+        return null;
+    }
+
+    @Override
+    public boolean canPlace(BlockData blockData) {
+        return false;
+    }
+
+    @Override
 	public boolean applyBoneMeal(BlockFace arg0) {
 		return false;
 	}
@@ -288,4 +300,19 @@ public class EntityBlock implements Block {
 	public Collection<ItemStack> getDrops(ItemStack arg0, Entity arg1) {
 		return null;
 	}
+
+    @Override
+    public boolean isPreferredTool(ItemStack itemStack) {
+        return false;
+    }
+
+    @Override
+    public float getBreakSpeed(Player player) {
+        return 0;
+    }
+
+    @Override
+    public String getTranslationKey() {
+        return null;
+    }
 }
