@@ -47,15 +47,16 @@ public class DoubleChestMatcher implements ProtectionFinder.Matcher {
      */
     public static final Set<Material> PROTECTABLES_CHESTS = EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST);
 
+	@Override
     public boolean matches(ProtectionFinder finder) {
         BlockState baseBlockState = finder.getBaseBlock();
-        Block block = baseBlockState.getBlock();
 
         // is the base block not what we want?
         if (!PROTECTABLES_CHESTS.contains(baseBlockState.getType())) {
             return false;
         }
 
+        Block block = baseBlockState.getBlock();
         Block otherChest = LWC.findAdjacentDoubleChest(block);
         if(otherChest != null) {
             finder.addBlock(otherChest);

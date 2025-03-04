@@ -74,6 +74,7 @@ public class DoorMatcher implements ProtectionFinder.Matcher {
             BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH
     };
 
+	@Override
     public boolean matches(ProtectionFinder finder) {
         BlockState baseBlockState = finder.getBaseBlock();
         Block block = baseBlockState.getBlock();

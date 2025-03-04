@@ -19,22 +19,25 @@ public class BedMatcher implements ProtectionFinder.Matcher {
             Material.LIME_BED, Material.MAGENTA_BED, Material.ORANGE_BED, Material.PINK_BED, Material.PURPLE_BED,
             Material.RED_BED, Material.WHITE_BED, Material.YELLOW_BED);
 
-    @Override
-    public boolean matches(ProtectionFinder finder) {
-        BlockState baseBlockState = finder.getBaseBlock();
-        Block baseBlock = baseBlockState.getBlock();
-        Bed baseBlockData;
-        try {
-            baseBlockData = (Bed) baseBlockState.getBlockData();
-            if (baseBlockData.getPart() == Bed.Part.FOOT) {
-                finder.addBlock(baseBlock.getRelative(baseBlockData.getFacing()));
-            } else {
-                finder.addBlock(baseBlock.getRelative(baseBlockData.getFacing().getOppositeFace()));
-            }
-            return true;
-        } catch (ClassCastException e) {
-            return false;
-        }
-    }
+	@Override
+	public boolean matches(ProtectionFinder finder) {
+		BlockState baseBlockState = finder.getBaseBlock();
+		if (BEDS.contains(baseBlockState.getType())) {
+			Block baseBlock = baseBlockState.getBlock();
+			Bed baseBlockData;
+			try {
+				baseBlockData = (Bed) baseBlockState.getBlockData();
+				if (baseBlockData.getPart() == Bed.Part.FOOT) {
+					finder.addBlock(baseBlock.getRelative(baseBlockData.getFacing()));
+				} else {
+					finder.addBlock(baseBlock.getRelative(baseBlockData.getFacing().getOppositeFace()));
+				}
+				return true;
+			} catch (ClassCastException e) {
+				return false;
+			}
+		}
+		return false;
+	}
 
 }
