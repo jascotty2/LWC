@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.sql;
 
 /**
@@ -34,7 +33,8 @@ package com.griefcraft.sql;
 public class Column {
 
     /**
-     * If the table should auto increment. Note: This is automatically set for SQLite with:
+     * If the table should auto increment. Note: This is automatically set for
+     * SQLite with:
      * <p>
      * table.setPrimary(true);
      * </p>

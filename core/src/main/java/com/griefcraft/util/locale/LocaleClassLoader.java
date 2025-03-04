@@ -25,23 +25,25 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.util.locale;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LocaleClassLoader extends ClassLoader {
 
     @Override
     protected URL findResource(String name) {
-        File file = new File("plugins/LWC/locale/" + name);
 
         try {
-            return new URL("file:" + file.getAbsolutePath());
+            File file = new File("plugins/LWC/locale/" + name);
+            return URI.create("file:" + file.getAbsolutePath()).toURL();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Logger.getAnonymousLogger(LocaleClassLoader.class.getName()).log(Level.SEVERE, "Failed to load resource '" + name + "'", e);
         }
 
         return super.findResource(name);

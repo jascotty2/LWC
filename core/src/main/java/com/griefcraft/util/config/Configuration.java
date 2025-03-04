@@ -47,13 +47,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Configuration extends ConfigurationNode {
-    private Yaml yaml;
-    private File file;
+    private final Yaml yaml;
+    private final File file;
 
     /**
      * List of loaded config files
      */
-    private static Map<String, Configuration> loaded = new HashMap<String, Configuration>();
+    private static final Map<String, Configuration> loaded = new HashMap();
 
     /**
      * The config updater for config files
@@ -61,7 +61,7 @@ public class Configuration extends ConfigurationNode {
     private static final ConfigUpdater updater = new ConfigUpdater();
 
     protected Configuration(File file) {
-        super(new HashMap<String, Object>());
+        super(new HashMap());
 
         DumperOptions options = new DumperOptions();
         options.setIndent(4);
@@ -188,7 +188,7 @@ public class Configuration extends ConfigurationNode {
         try {
             read(yaml.load(new UnicodeReader(inputStream)));
         } catch (ConfigurationException e) {
-            root = new HashMap<String, Object>();
+            root = new HashMap();
         } finally {
             try {
                 if (inputStream != null) {
@@ -207,7 +207,7 @@ public class Configuration extends ConfigurationNode {
             cache.clear();
             load(new FileInputStream(file));
         } catch (IOException e) {
-            root = new HashMap<String, Object>();
+            root = new HashMap();
         }
     }
 
@@ -245,7 +245,7 @@ public class Configuration extends ConfigurationNode {
     private void read(Object input) throws ConfigurationException {
         try {
             if (null == input) {
-                root = new HashMap<String, Object>();
+                root = new HashMap();
             } else {
                 root = (Map<String, Object>) input;
             }
@@ -261,6 +261,6 @@ public class Configuration extends ConfigurationNode {
      * @return
      */
     public static ConfigurationNode getEmptyNode() {
-        return new ConfigurationNode(new HashMap<String, Object>());
+        return new ConfigurationNode(new HashMap());
     }
 }

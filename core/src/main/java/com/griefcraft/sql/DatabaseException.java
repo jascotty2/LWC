@@ -25,10 +25,10 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.sql;
 
 public class DatabaseException extends RuntimeException {
+
     private static final long serialVersionUID = 1L;
 
     public DatabaseException() {

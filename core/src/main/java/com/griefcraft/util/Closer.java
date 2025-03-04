@@ -32,7 +32,7 @@ import org.apache.commons.lang.Validate;
 
 public class Closer implements Closeable
 {
-    private final List<AutoCloseable> list = new ArrayList<>();
+    private final List<AutoCloseable> list = new ArrayList();
 
     /**
      * Registers a closeable object.

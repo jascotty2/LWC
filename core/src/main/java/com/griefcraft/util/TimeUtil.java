@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.util;
 
 public class TimeUtil {
@@ -47,7 +46,7 @@ public class TimeUtil {
             }
 
             String sub = split[index].toLowerCase();
-            int multiplier = 0; // e.g 2 hours = 2
+            int multiplier; // e.g 2 hours = 2
             long unit = 0; // e.g hours = 3600
 
             try {
@@ -83,7 +82,8 @@ public class TimeUtil {
      * Convert a given time in seconds to a more readable format
      *
      * @param time
-     * @return the time in a more readable format (e.g 2 days 5 hours 1 minute 34  seconds)
+     * @return the time in a more readable format (e.g 2 days 5 hours 1 minute
+     * 34 seconds)
      */
     public static String timeToString(long time) {
         String str = "";

@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.util.locale;
 
 import java.io.IOException;
@@ -39,6 +38,7 @@ import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
 public class UTF8Control extends Control {
+
     @Override
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IllegalAccessException, InstantiationException, IOException {
         // The below is a copy of the default implementation.

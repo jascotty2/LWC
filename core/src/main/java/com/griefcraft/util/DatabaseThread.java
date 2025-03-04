@@ -46,7 +46,7 @@ public class DatabaseThread implements Runnable {
     /**
      * The protections waiting to be updated in the database
      */
-    private final Queue<Protection> updateQueue = new ConcurrentLinkedQueue<Protection>();
+    private final Queue<Protection> updateQueue = new ConcurrentLinkedQueue();
 
     /**
      * The thread we are running in
@@ -160,6 +160,7 @@ public class DatabaseThread implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         while (running) {
             // how many seconds between each flush

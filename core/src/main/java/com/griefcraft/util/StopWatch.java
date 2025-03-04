@@ -25,7 +25,7 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-/*
+ /*
  * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,11 +41,10 @@
  * limitations under the License.
  */
 
-/*
+ /*
  * Note: this code is originally part of the package org.springframework.util,
  * which is a part of the Spring Framework application framework.
  */
-
 package com.griefcraft.util;
 
 import org.bukkit.command.CommandSender;
@@ -55,17 +54,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Simple stop watch, allowing for timing of a number of tasks,
- * exposing total running time and running time for each named task.
- * <p/>
- * <p>Conceals use of <code>System.currentTimeMillis()</code>, improving the
- * readability of application code and reducing the likelihood of calculation errors.
- * <p/>
- * <p>Note that this object is not designed to be thread-safe and does not
- * use synchronization.
- * <p/>
- * <p>This class is normally used to verify performance during proof-of-concepts
+ * Simple stop watch, allowing for timing of a number of tasks, exposing total
+ * running time and running time for each named task.
+ * <br>
+ * <p>
+ * Conceals use of <code>System.currentTimeMillis()</code>, improving the
+ * readability of application code and reducing the likelihood of calculation
+ * errors.
+ * </p>
+ * <p>
+ * Note that this object is not designed to be thread-safe and does not use
+ * synchronization.
+ * </p>
+ * <p>
+ * This class is normally used to verify performance during proof-of-concepts
  * and in development, rather than as part of production applications.
+ * </p>
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -74,9 +78,9 @@ import java.util.List;
 public class StopWatch {
 
     /**
-     * Identifier of this stop watch.
-     * Handy when we have output from multiple stop watches
-     * and need to distinguish between them in log or console output.
+     * Identifier of this stop watch. Handy when we have output from multiple
+     * stop watches and need to distinguish between them in log or console
+     * output.
      */
     private final String id;
 
@@ -85,7 +89,7 @@ public class StopWatch {
     /**
      * List of TaskInfo objects
      */
-    private final List<TaskInfo> taskList = new LinkedList<TaskInfo>();
+    private final List<TaskInfo> taskList = new LinkedList();
 
     /**
      * Start time of the current task
@@ -111,7 +115,6 @@ public class StopWatch {
      */
     private long totalTimeMillis;
 
-
     /**
      * Construct a new stop watch. Does not start any task.
      */
@@ -120,12 +123,10 @@ public class StopWatch {
     }
 
     /**
-     * Construct a new stop watch with the given id.
-     * Does not start any task.
+     * Construct a new stop watch with the given id. Does not start any task.
      *
-     * @param id identifier for this stop watch.
-     *           Handy when we have output from multiple stop watches
-     *           and need to distinguish between them.
+     * @param id identifier for this stop watch. Handy when we have output from
+     * multiple stop watches and need to distinguish between them.
      */
     public StopWatch(String id) {
         this.id = id;
@@ -140,10 +141,9 @@ public class StopWatch {
         this.keepTaskList = keepTaskList;
     }
 
-
     /**
-     * Start an unnamed task. The results are undefined if {@link #stop()}
-     * or timing methods are called without invoking this method.
+     * Start an unnamed task. The results are undefined if {@link #stop()} or
+     * timing methods are called without invoking this method.
      *
      * @see #stop()
      */
@@ -152,8 +152,8 @@ public class StopWatch {
     }
 
     /**
-     * Start a named task. The results are undefined if {@link #stop()}
-     * or timing methods are called without invoking this method.
+     * Start a named task. The results are undefined if {@link #stop()} or
+     * timing methods are called without invoking this method.
      *
      * @param taskName the name of the task to start
      * @see #stop()
@@ -168,8 +168,8 @@ public class StopWatch {
     }
 
     /**
-     * Stop the current task. The results are undefined if timing
-     * methods are called without invoking at least one pair
+     * Stop the current task. The results are undefined if timing methods are
+     * called without invoking at least one pair
      * {@link #start()} / {@link #stop()} methods.
      *
      * @see #start()
@@ -195,7 +195,6 @@ public class StopWatch {
     public boolean isRunning() {
         return this.running;
     }
-
 
     /**
      * Return the time taken by the last task.
@@ -238,7 +237,6 @@ public class StopWatch {
         return this.taskList.toArray(new TaskInfo[this.taskList.size()]);
     }
 
-
     /**
      * Return a short description of the total running time.
      */
@@ -247,8 +245,8 @@ public class StopWatch {
     }
 
     /**
-     * Return a string with a table describing all tasks performed.
-     * For custom reporting, call getTaskInfo() and use the task info directly.
+     * Return a string with a table describing all tasks performed. For custom
+     * reporting, call getTaskInfo() and use the task info directly.
      */
     public String prettyPrint() {
         StringBuilder sb = new StringBuilder(shortSummary());
@@ -306,8 +304,9 @@ public class StopWatch {
     }
 
     /**
-     * Return an informative string describing all tasks performed
-     * For custom reporting, call <code>getTaskInfo()</code> and use the task info directly.
+     * Return an informative string describing all tasks performed For custom
+     * reporting, call <code>getTaskInfo()</code> and use the task info
+     * directly.
      */
     @Override
     public String toString() {
@@ -324,7 +323,6 @@ public class StopWatch {
         }
         return sb.toString();
     }
-
 
     /**
      * Inner class to hold data about one task executed within the stop watch.

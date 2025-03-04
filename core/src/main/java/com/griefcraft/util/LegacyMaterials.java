@@ -7,8 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 public class LegacyMaterials {
-	private static Map<Integer, Material> idToMaterial = new HashMap<>();
-	private static Map<Material, Integer> materialToId = new HashMap<>();
+	private static final Map<Integer, Material> idToMaterial = new HashMap<>();
+	private static final Map<Material, Integer> materialToId = new HashMap<>();
 
 	static {
 		for (Material material : Material.values()) {

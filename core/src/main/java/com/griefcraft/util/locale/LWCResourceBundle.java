@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.util.locale;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class LWCResourceBundle extends ResourceBundle {
     /**
      * Stores bundles that override the defaults
      */
-    private List<ResourceBundle> extensionBundles = new ArrayList<ResourceBundle>();
+    private final List<ResourceBundle> extensionBundles = new ArrayList();
 
     public LWCResourceBundle(ResourceBundle parent) {
         this.parent = parent;
@@ -63,7 +62,7 @@ public class LWCResourceBundle extends ResourceBundle {
 
     @Override
     public Enumeration<String> getKeys() {
-        Set<String> keys = new HashSet<String>();
+        Set<String> keys = new HashSet();
         keys.addAll(parent.keySet());
 
         // add the extension bundles' keys as well
@@ -81,7 +80,7 @@ public class LWCResourceBundle extends ResourceBundle {
      * @return
      */
     private Object getObjectFromExtensionBundles(String key) {
-        if (extensionBundles.size() == 0) {
+        if (extensionBundles.isEmpty()) {
             return null;
         }
 

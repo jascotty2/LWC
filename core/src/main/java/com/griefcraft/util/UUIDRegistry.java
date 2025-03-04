@@ -14,13 +14,13 @@ public class UUIDRegistry {
     /**
      * Temporal caches
      */
-    private static final Map<String, PlayerInfo> nameToUUIDCache = new HashMap<String, PlayerInfo>();
-    private static final Map<UUID, PlayerInfo> UUIDToNameCache = new HashMap<UUID, PlayerInfo>();
+    private static final Map<String, PlayerInfo> nameToUUIDCache = new HashMap();
+    private static final Map<UUID, PlayerInfo> UUIDToNameCache = new HashMap();
 
     static class PlayerInfo {
 
-        private UUID uuid;
-        private String name;
+        private final UUID uuid;
+        private final String name;
 
         public PlayerInfo(UUID uuid, String name) {
             this.uuid = uuid;
@@ -59,7 +59,8 @@ public class UUIDRegistry {
     }
 
     /**
-     * Get the name for the given UUID. If it is not already known, it will be retrieved from the account servers.
+     * Get the name for the given UUID. If it is not already known, it will be
+     * retrieved from the account servers.
      *
      * @param uuid
      * @return
@@ -104,7 +105,8 @@ public class UUIDRegistry {
     }
 
     /**
-     * Get the UUID for the given name. If it is not already known, it will be retrieved from the account servers.
+     * Get the UUID for the given name. If it is not already known, it will be
+     * retrieved from the account servers.
      *
      * @param name
      * @return
@@ -156,8 +158,9 @@ public class UUIDRegistry {
     }
 
     /**
-     * Attempts to format a player's name, which can be a name or a UUID. If the owner is a UUID and then
-     * UUID is unknown, then "Unknown (uuid)" will be returned.
+     * Attempts to format a player's name, which can be a name or a UUID. If the
+     * owner is a UUID and then UUID is unknown, then "Unknown (uuid)" will be
+     * returned.
      *
      * @param name
      * @return

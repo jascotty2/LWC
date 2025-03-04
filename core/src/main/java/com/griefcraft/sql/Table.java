@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.sql;
 
 import com.griefcraft.lwc.LWC;
@@ -156,7 +155,6 @@ public class Table {
         }
 
         // database.log("Synched table " + prefix + name + " (" + columns.size() + " columns)");
-
         // add the query to performance
         Statistics.addQuery();
     }

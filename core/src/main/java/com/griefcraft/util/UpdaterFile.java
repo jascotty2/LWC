@@ -28,6 +28,8 @@
 
 package com.griefcraft.util;
 
+import java.util.Objects;
+
 public class UpdaterFile {
 
     /**
@@ -59,6 +61,14 @@ public class UpdaterFile {
         UpdaterFile other = (UpdaterFile) obj;
 
         return other.getLocalLocation().equals(localLocation) && other.getRemoteLocation().equals(remoteLocation);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.localLocation);
+        hash = 79 * hash + Objects.hashCode(this.remoteLocation);
+        return hash;
     }
 
     /**

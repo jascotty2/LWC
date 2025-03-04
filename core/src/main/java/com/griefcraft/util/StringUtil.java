@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.util;
 
 import java.security.MessageDigest;
@@ -115,7 +114,6 @@ public class StringUtil {
             final byte[] raw = md.digest();
             return byteArray2Hex(raw);
         } catch (final Exception e) {
-
         }
 
         return "";
@@ -145,7 +143,8 @@ public class StringUtil {
     }
 
     /**
-     * Join an array into a String, where the array values are delimited by spaces.
+     * Join an array into a String, where the array values are delimited by
+     * spaces.
      *
      * @param arr
      * @return
@@ -155,7 +154,8 @@ public class StringUtil {
     }
 
     /**
-     * Join an array into a String, where the array values are delimited by spaces, starting at the given offset.
+     * Join an array into a String, where the array values are delimited by
+     * spaces, starting at the given offset.
      *
      * @param arr
      * @param offset
@@ -166,7 +166,8 @@ public class StringUtil {
     }
 
     /**
-     * Join an array into a String, where the array values are delimited by the given string, starting at the given offset.
+     * Join an array into a String, where the array values are delimited by the
+     * given string, starting at the given offset.
      *
      * @param arr
      * @param offset

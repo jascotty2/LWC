@@ -50,7 +50,7 @@ public class ConfigUpdater {
     /**
      * Config nodes NOT to update - this includes child nodes
      */
-    private static List<String> BLACKLIST = Arrays.asList(
+    private static final List<String> BLACKLIST = Arrays.asList(
             "protections.blocks",
             "master",
             "groups",
@@ -61,7 +61,7 @@ public class ConfigUpdater {
     /**
      * The cache for the reference config files
      */
-    private final Map<String, Configuration> referenceConfigFileCache = new HashMap<String, Configuration>();
+    private final Map<String, Configuration> referenceConfigFileCache = new HashMap();
 
     /**
      * Load the reference config files in the local jar file. The key in the map is the
@@ -70,7 +70,7 @@ public class ConfigUpdater {
      * @return
      */
     private Map<String, Configuration> loadReferenceConfigFiles() throws IOException {
-        if (referenceConfigFileCache.size() > 0) {
+        if (!referenceConfigFileCache.isEmpty()) {
             return referenceConfigFileCache;
         }
 
@@ -164,7 +164,7 @@ public class ConfigUpdater {
      * @return
      */
     private List<String> getKeysDepth2(Configuration configuration) {
-        List<String> keys = new ArrayList<String>();
+        List<String> keys = new ArrayList();
 
         // go through the root
         for (String key : configuration.getKeys(null)) {

@@ -8,9 +8,9 @@ public class SetUtil {
     }
 
     /**
-     * Adds the given object to the set if it's not null.
-     * EnumSets error out if you add a null value, so this works around
-     * it with a helper method.
+     * Adds the given object to the set if it's not null. <br>
+     * EnumSets error out if you add a null value, so this works around it with
+     * a helper method.
      *
      * @param set
      * @param objects

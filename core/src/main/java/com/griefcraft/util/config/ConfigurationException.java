@@ -25,10 +25,10 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.util.config;
 
 public class ConfigurationException extends Exception {
+
     private static final long serialVersionUID = -2442886939908724203L;
 
     public ConfigurationException() {

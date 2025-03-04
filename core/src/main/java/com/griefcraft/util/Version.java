@@ -28,6 +28,7 @@
 
 package com.griefcraft.util;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -168,6 +169,12 @@ public final class Version implements Comparable {
         return version.compareTo(this) == 0;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.rawVersion);
+    }
+
+    @Override
     public int compareTo(Object o) {
         if (!(o instanceof Version)) {
             return 0;

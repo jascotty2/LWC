@@ -53,7 +53,7 @@ public class ProtectionFinder {
     /**
      * The LWC object to work with
      */
-    private LWC lwc;
+    private final LWC lwc;
 
     /**
      * The base block to match off of
@@ -73,12 +73,12 @@ public class ProtectionFinder {
     /**
      * All of the matched blocks
      */
-    private final List<BlockState> blocks = new LinkedList<BlockState>();
+    private final List<BlockState> blocks = new LinkedList();
 
     /**
      * All of the blocks that are protectables
      */
-    private final List<BlockState> protectables = new LinkedList<BlockState>();
+    private final List<BlockState> protectables = new LinkedList();
 
     public ProtectionFinder(LWC lwc) {
         this.lwc = lwc;
@@ -268,12 +268,11 @@ public class ProtectionFinder {
      * @param noAutoCache if a match is found, don't cache it to be the protection we use
      * @return
      */
-    protected Result tryLoadProtection(BlockState block, boolean noAutoCache) {
+    private Result tryLoadProtection(BlockState block, boolean noAutoCache) {
         if (matchedProtection != null) {
             return Result.E_FOUND;
         }
 
-        LWC lwc = LWC.getInstance();
         ProtectionCache cache = lwc.getProtectionCache();
 
         // Check the cache

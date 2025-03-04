@@ -25,17 +25,13 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.sql;
-
 
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -43,8 +39,6 @@ import org.bukkit.Bukkit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.ModuleException;
 import com.griefcraft.util.Statistics;
@@ -57,7 +51,7 @@ public abstract class Database {
         SQLite("sqlite.jar"), //
         NONE("nil"); //
 
-        private String driver;
+        private final String driver;
 
         Type(String driver) {
             this.driver = driver;
@@ -106,7 +100,8 @@ public abstract class Database {
             if (closeable != null) {
                 closeable.close();
             }
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
     }
 
     /**
@@ -137,7 +132,8 @@ public abstract class Database {
     protected String prefix = "";
 
     /**
-     * If the high level statement cache should be used. If this is false, already cached statements are ignored
+     * If the high level statement cache should be used. If this is false,
+     * already cached statements are ignored
      */
     private boolean useStatementCache = true;
 
@@ -315,7 +311,8 @@ public abstract class Database {
     }
 
     /**
-     * Prepare a statement unless it's already cached (and if so, just return it)
+     * Prepare a statement unless it's already cached (and if so, just return
+     * it)
      *
      * @param sql
      * @return
@@ -325,7 +322,8 @@ public abstract class Database {
     }
 
     /**
-     * Prepare a statement unless it's already cached (and if so, just return it)
+     * Prepare a statement unless it's already cached (and if so, just return
+     * it)
      *
      * @param sql
      * @param returnGeneratedKeys
@@ -340,7 +338,9 @@ public abstract class Database {
             if (useStatementCache) {
                 Statistics.addQuery();
                 final PreparedStatement p = statementCache.getIfPresent(sql);
-                if(p != null) return p;
+                if (p != null) {
+                    return p;
+                }
             }
 
             return prepareInternal(sql, returnGeneratedKeys);
@@ -440,7 +440,8 @@ public abstract class Database {
     }
 
     /**
-     * Returns true if the high level statement cache should be used. If this is false, already cached statements are ignored
+     * Returns true if the high level statement cache should be used. If this is
+     * false, already cached statements are ignored
      *
      * @return
      */
