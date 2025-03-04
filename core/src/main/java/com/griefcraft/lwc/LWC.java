@@ -27,7 +27,6 @@
  */
 package com.griefcraft.lwc;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -134,10 +133,15 @@ import com.griefcraft.scripting.event.LWCReloadEvent;
 import com.griefcraft.scripting.event.LWCSendLocaleEvent;
 import com.griefcraft.sql.Database;
 import com.griefcraft.sql.PhysDB;
-import com.griefcraft.util.*;
+import com.griefcraft.util.Closer;
+import com.griefcraft.util.DatabaseThread;
+import com.griefcraft.util.ProtectionFinder;
+import com.griefcraft.util.Statistics;
+import com.griefcraft.util.StringUtil;
+import com.griefcraft.util.UUIDRegistry;
 import com.griefcraft.util.config.Configuration;
-import com.griefcraft.util.locale.LocaleUtil;
 import com.griefcraft.util.matchers.DoubleChestMatcher;
+import org.bukkit.ChatColor;
 
 public class LWC {
 
@@ -358,10 +362,10 @@ public class LWC {
         final BlockData d = block.getBlockData();
         if (d instanceof Chest) {
             final Chest c = (Chest) d;
-            if(c.getType() != Chest.Type.SINGLE) {
+            if (c.getType() != Chest.Type.SINGLE) {
                 // this is a double chest - check the other chest for registration data
                 Block other = null;
-                switch(c.getFacing()) {
+                switch (c.getFacing()) {
                     case SOUTH:
                         other = block.getRelative(c.getType() != Chest.Type.RIGHT ? BlockFace.WEST : BlockFace.EAST);
                         break;
@@ -623,7 +627,8 @@ public class LWC {
      * @param protection
      * @param block
      * @param hasAccess
-     * @param notice     Should this method print a notice to the player? (some events may call this several times)
+     * @param notice Should this method print a notice to the player? (some
+     * events may call this several times)
      * @return true if the player was granted access
      */
     public boolean enforceAccess(Player player, Protection protection, Block block, boolean hasAccess, boolean notice) {
@@ -633,8 +638,8 @@ public class LWC {
             return true;
         }
 
-        String blockType = block instanceof EntityBlock ? ((EntityBlock) block).getTypeString() :
-                block.getType().name();
+        String blockType = block instanceof EntityBlock ? ((EntityBlock) block).getTypeString()
+                : block.getType().name();
 
         // support for old protection dbs that do not contain the block id
         if (protection.getBlockTypeString() == null && blockType != null) {
@@ -924,7 +929,7 @@ public class LWC {
         }
 
         if (message == null) {
-            sender.sendMessage(Colors.Red + "LWC: " + Colors.White + "Undefined locale: \"" + Colors.Gray + key + Colors.White + "\"");
+            sender.sendMessage(ChatColor.DARK_RED + "LWC: " + ChatColor.WHITE + "Undefined locale: \"" + ChatColor.DARK_GRAY + key + ChatColor.WHITE + "\"");
             return;
         }
 
@@ -1012,7 +1017,7 @@ public class LWC {
                 count++;
 
                 if (count % 100000 == 0 || count == totalProtections || count == 1) {
-                    sender.sendMessage(Colors.Red + count + " / " + totalProtections);
+                    sender.sendMessage(ChatColor.DARK_RED.toString() + count + " / " + totalProtections);
                 }
 
                 if (world == null) {
@@ -1079,8 +1084,8 @@ public class LWC {
                             .append(protectionId);
                     deleteHistoryQuery.append("UPDATE ").append(prefix)
                             .append("history SET status = ")
-                                     .append(String.valueOf(History.Status.INACTIVE.ordinal()))
-                                     .append(" WHERE protectionId IN(").append(protectionId);
+                            .append(String.valueOf(History.Status.INACTIVE.ordinal()))
+                            .append(" WHERE protectionId IN(").append(protectionId);
                 } else {
                     deleteProtectionsQuery.append(",").append(protectionId);
                     deleteHistoryQuery.append(",").append(protectionId);
@@ -1094,7 +1099,7 @@ public class LWC {
                     deleteProtectionsQuery.setLength(0);
                     deleteHistoryQuery.setLength(0);
 
-                    sender.sendMessage(Colors.Green + "REMOVED " + (count + 1) + " / " + total);
+                    sender.sendMessage(ChatColor.DARK_GREEN + "REMOVED " + (count + 1) + " / " + total);
                 }
 
                 ++count;
@@ -1368,7 +1373,6 @@ public class LWC {
         return Boolean.parseBoolean(resolveProtectionConfiguration(block, "enabled"));
     }
 
-
     /**
      * Check a block to see if it is protectable
      *
@@ -1378,7 +1382,7 @@ public class LWC {
     public boolean isProtectable(Entity entity) {
         if (entity == null) {
             return false;
-        } 
+        }
         return Boolean.parseBoolean(resolveProtectionConfiguration(entity.getType(), "enabled"));
     }
 
@@ -1493,7 +1497,7 @@ public class LWC {
 
         if (materialName.contains("_")) { // Prefix wildcarding for shulker boxes & gates
             int i = materialName.indexOf("_") + 1;
-            while(i > 0) {
+            while (i > 0) {
                 names.add("*_" + materialName.substring(i));
                 i = materialName.indexOf("_", i) + 1;
             }
@@ -1653,7 +1657,7 @@ public class LWC {
 
         // check any major conversions
         new MySQLPost200().run();
-        
+
         // check for version conversion
         DatabaseUpgradeManager.run();
 
@@ -1904,18 +1908,18 @@ public class LWC {
                 protection.save();
 
                 if (type == Permission.Type.PLAYER) {
-                    sendLocale(sender, "protection.interact.rights.register." + localeChild, "name", UUIDRegistry.formatPlayerName(value), "isadmin", isAdmin ? "[" + Colors.Red + "ADMIN" + Colors.Gold + "]" : "");
+                    sendLocale(sender, "protection.interact.rights.register." + localeChild, "name", UUIDRegistry.formatPlayerName(value), "isadmin", isAdmin ? "[" + ChatColor.DARK_RED + "ADMIN" + ChatColor.GOLD + "]" : "");
                 } else {
-                    sendLocale(sender, "protection.interact.rights.register." + localeChild, "name", value, "isadmin", isAdmin ? "[" + Colors.Red + "ADMIN" + Colors.Gold + "]" : "");
+                    sendLocale(sender, "protection.interact.rights.register." + localeChild, "name", value, "isadmin", isAdmin ? "[" + ChatColor.DARK_RED + "ADMIN" + ChatColor.GOLD + "]" : "");
                 }
             } else {
                 protection.removePermissions(value, type);
                 protection.save();
 
                 if (type == Permission.Type.PLAYER) {
-                    sendLocale(sender, "protection.interact.rights.remove." + localeChild, "name", UUIDRegistry.formatPlayerName(value), "isadmin", isAdmin ? "[" + Colors.Red + "ADMIN" + Colors.Gold + "]" : "");
+                    sendLocale(sender, "protection.interact.rights.remove." + localeChild, "name", UUIDRegistry.formatPlayerName(value), "isadmin", isAdmin ? "[" + ChatColor.DARK_RED + "ADMIN" + ChatColor.GOLD + "]" : "");
                 } else {
-                    sendLocale(sender, "protection.interact.rights.remove." + localeChild, "name", value, "isadmin", isAdmin ? "[" + Colors.Red + "ADMIN" + Colors.Gold + "]" : "");
+                    sendLocale(sender, "protection.interact.rights.remove." + localeChild, "name", value, "isadmin", isAdmin ? "[" + ChatColor.DARK_RED + "ADMIN" + ChatColor.GOLD + "]" : "");
                 }
             }
         }
@@ -1986,7 +1990,7 @@ public class LWC {
 
         if (isAdmin(sender)) {
             sender.sendMessage("");
-            sender.sendMessage(Colors.Red + "/lwc admin - Administration");
+            sender.sendMessage(ChatColor.DARK_RED + "/lwc admin - Administration");
         }
     }
 

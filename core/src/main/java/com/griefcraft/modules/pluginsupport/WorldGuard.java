@@ -35,7 +35,6 @@ import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCAccessEvent;
 import com.griefcraft.scripting.event.LWCCommandEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
-import com.griefcraft.util.Colors;
 import com.griefcraft.util.config.Configuration;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -53,6 +52,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 public class WorldGuard extends JavaModule {
@@ -107,7 +107,7 @@ public class WorldGuard extends JavaModule {
 
         // check for worldguard
         if (worldGuardPlugin == null) {
-            sender.sendMessage(Colors.Red + "WorldGuard is not enabled.");
+            sender.sendMessage(ChatColor.DARK_RED + "WorldGuard is not enabled.");
             return;
         }
 
@@ -117,7 +117,7 @@ public class WorldGuard extends JavaModule {
         }
 
         if (!(sender instanceof Player) && args.length < 3) {
-            sender.sendMessage(Colors.Red + "You must specify the world name the region is in since you are not logged in as a player.");
+            sender.sendMessage(ChatColor.DARK_RED + "You must specify the world name the region is in since you are not logged in as a player.");
             return;
         }
 
@@ -138,7 +138,7 @@ public class WorldGuard extends JavaModule {
 
         // was the world found?
         if (world == null) {
-            sender.sendMessage(Colors.Red + "Invalid world.");
+            sender.sendMessage(ChatColor.DARK_RED + "Invalid world.");
             return;
         }
 
@@ -147,7 +147,7 @@ public class WorldGuard extends JavaModule {
 
         // has world a region manager?
         if (regionManager == null) {
-            sender.sendMessage(Colors.Red + "World not managed by WorldGuard");
+            sender.sendMessage(ChatColor.DARK_RED + "World not managed by WorldGuard");
             return;
         }
 
@@ -155,7 +155,7 @@ public class WorldGuard extends JavaModule {
         ProtectedRegion region = regionManager.getRegion(regionName);
 
         if (region == null) {
-            sender.sendMessage(Colors.Red + "Region not found. If you region is in a different world than you, please use: /lwc admin " + commandName + " " + regionName + " WorldName");
+            sender.sendMessage(ChatColor.DARK_RED + "Region not found. If you region is in a different world than you, please use: /lwc admin " + commandName + " " + regionName + " WorldName");
             return;
         }
 
@@ -173,7 +173,7 @@ public class WorldGuard extends JavaModule {
         int maxBlockZ = maximum.getBlockZ();
 
         // Calculate the amount of the blocks in the region
-        int numBlocks = (maxBlockX - minBlockX + 1) * (maxBlockY - minBlockY + 1) * (maxBlockZ - minBlockZ + 1);
+        //int numBlocks = (maxBlockX - minBlockX + 1) * (maxBlockY - minBlockY + 1) * (maxBlockZ - minBlockZ + 1);
 
         if (args[0].equals("purgeregion")) { // TODO: Entity support
             // get all of the protections inside of the region
@@ -184,7 +184,7 @@ public class WorldGuard extends JavaModule {
                 protection.remove();
             }
 
-            sender.sendMessage(Colors.Green + "Removed " + protections.size() + " protections from the region " + regionName);
+            sender.sendMessage(ChatColor.DARK_GREEN + "Removed " + protections.size() + " protections from the region " + regionName);
         } else if (args[0].equals("protectregion")) { // TODO: Entity support
             // The owner to assign to the protections
             String ownerName = "LWCWorldGuard";

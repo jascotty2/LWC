@@ -25,19 +25,18 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.model;
 
-import com.griefcraft.util.Colors;
 import com.griefcraft.util.StringUtil;
 import com.griefcraft.util.UUIDRegistry;
+import org.bukkit.ChatColor;
 import org.json.simple.JSONObject;
 
 public class Permission {
 
     /**
-     * The access level
-     * The ordering of this enum <b>MUST NOT</b> change as ordinal values are used internally.
+     * The access level The ordering of this enum <b>MUST NOT</b> change as
+     * ordinal values are used internally.
      */
     public enum Access {
 
@@ -45,12 +44,10 @@ public class Permission {
          * The player has no access
          */
         NONE,
-
         /**
          * The player has rights that of a regular player
          */
         PLAYER,
-
         /**
          * The player has admin rights
          */
@@ -63,35 +60,31 @@ public class Permission {
     }
 
     /**
-     * The type this permission applies to.
-     * The ordering of this enum <b>MUST NOT</b> change as ordinal values are used internally.
+     * The type this permission applies to. The ordering of this enum <b>MUST
+     * NOT</b> change as ordinal values are used internally.
      */
     public enum Type {
         /**
          * Applies to a specific group of players
          */
         GROUP,
-
         /**
          * Applies to a specific player
          */
         PLAYER,
-
         /**
          * Unused / reserved, has been used before
          */
         RESERVED,
-
         /**
          * Applies to citizens of a Towny town
          */
         TOWN,
-
         /**
-         * Allows a specific item (such as a key) to open the protection when interacted with in hand
+         * Allows a specific item (such as a key) to open the protection when
+         * interacted with in hand
          */
         ITEM,
-
         /**
          * Applies to members of a WorldGuard region
          */
@@ -180,25 +173,25 @@ public class Permission {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(Colors.Yellow);
+        builder.append(ChatColor.YELLOW.getChar());
         if (type == Type.PLAYER) {
             builder.append(UUIDRegistry.formatPlayerName(getName()));
         } else {
             builder.append(getName());
         }
-        builder.append(Colors.White);
+        builder.append(ChatColor.WHITE);
         builder.append(" (");
-        builder.append(Colors.Green);
+        builder.append(ChatColor.DARK_GREEN);
         builder.append(getType());
-        builder.append(Colors.White);
+        builder.append(ChatColor.WHITE);
         builder.append(") ");
 
         if (getAccess() == Access.ADMIN) {
-        builder.append(Colors.White);
+            builder.append(ChatColor.WHITE);
             builder.append("(");
-            builder.append(Colors.Red);
+            builder.append(ChatColor.DARK_RED);
             builder.append("ADMIN");
-        builder.append(Colors.White);
+            builder.append(ChatColor.WHITE);
             builder.append(")");
         }
         return builder.toString();

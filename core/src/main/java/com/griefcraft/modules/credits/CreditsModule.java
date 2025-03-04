@@ -31,7 +31,6 @@ package com.griefcraft.modules.credits;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCCommandEvent;
-import com.griefcraft.util.Colors;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -39,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.bukkit.ChatColor;
 
 public class CreditsModule extends JavaModule {
 
@@ -60,7 +60,7 @@ public class CreditsModule extends JavaModule {
     /**
      * Players to send to and the credits index
      */
-    private final Map<CommandSender, Integer> scrolling = Collections.synchronizedMap(new HashMap<CommandSender, Integer>());
+    private final Map<CommandSender, Integer> scrolling = Collections.synchronizedMap(new HashMap());
 
     private class CreditsTask implements Runnable {
 
@@ -118,40 +118,40 @@ public class CreditsModule extends JavaModule {
     @Override
     public void load(LWC lwc) {
         credits = new String[]{
-                Colors.Green + "LWC, a Protection mod developed by Hidendra ....",
+                ChatColor.DARK_GREEN + "LWC, a Protection mod developed by Hidendra ....",
                 "Serving Minecraft loyally since September 2010 ....",
                 " ",
 
-                Colors.Red + "Core contributions",
+                ChatColor.DARK_RED + "Core contributions",
                 "angelsl",
                 "morganm",
                 " ",
 
-                Colors.Red + "Translations",
-                Colors.Green + "German - " + Colors.White + "Dawodo",
-                Colors.Green + "Polish - " + Colors.White + "Geoning, dudsonowa, and andrewkm",
-                Colors.Green + "French - " + Colors.White + "cehel",
-                Colors.Green + "Dutch - " + Colors.White + "Madzero and aoa2003",
-                Colors.Green + "Czech - " + Colors.White + "hofec",
-                Colors.Green + "Swedish - " + Colors.White + "christley",
-                Colors.Green + "Russian - " + Colors.White + "IlyaGulya",
-                Colors.Green + "Spanish - " + Colors.White + "Raul \"RME\" Martinez and David \"DME\" Martinez",
-                Colors.Green + "Danish - " + Colors.White + "TCarlsen, cannafix",
-                Colors.Green + "Italian - " + Colors.White + "portaro",
-                Colors.Green + "Hungarian - " + Colors.White + "dretax",
+                ChatColor.DARK_RED + "Translations",
+                ChatColor.DARK_GREEN + "German - " + ChatColor.WHITE + "Dawodo",
+                ChatColor.DARK_GREEN + "Polish - " + ChatColor.WHITE + "Geoning, dudsonowa, and andrewkm",
+                ChatColor.DARK_GREEN + "French - " + ChatColor.WHITE + "cehel",
+                ChatColor.DARK_GREEN + "Dutch - " + ChatColor.WHITE + "Madzero and aoa2003",
+                ChatColor.DARK_GREEN + "Czech - " + ChatColor.WHITE + "hofec",
+                ChatColor.DARK_GREEN + "Swedish - " + ChatColor.WHITE + "christley",
+                ChatColor.DARK_GREEN + "Russian - " + ChatColor.WHITE + "IlyaGulya",
+                ChatColor.DARK_GREEN + "Spanish - " + ChatColor.WHITE + "Raul \"RME\" Martinez and David \"DME\" Martinez",
+                ChatColor.DARK_GREEN + "Danish - " + ChatColor.WHITE + "TCarlsen, cannafix",
+                ChatColor.DARK_GREEN + "Italian - " + ChatColor.WHITE + "portaro",
+                ChatColor.DARK_GREEN + "Hungarian - " + ChatColor.WHITE + "dretax",
                 " ",
 
-                Colors.Red + "Donations",
-                Colors.Gray + "(chronological order)",
+                ChatColor.DARK_RED + "Donations",
+                ChatColor.DARK_GRAY + "(chronological order)",
                 "darknavi",
                 "Vetyver",
                 "pablo0713",
-                Colors.Red + "IrishSailor & Land of Legend server X2",
+                ChatColor.DARK_RED + "IrishSailor & Land of Legend server X2",
                 "aidan",
-                Colors.Bold + Colors.Gold + "MonsterTKE X3",
+                ChatColor.BOLD.toString() + ChatColor.GOLD + "MonsterTKE X3",
                 "wokka",
                 "Andreoli3",
-                Colors.Bold + Colors.Gold + "andrewkm X3",
+                ChatColor.BOLD.toString() + ChatColor.GOLD + "andrewkm X3",
                 "Eric King",
                 "Twizz",
                 "spunkiie",
@@ -178,8 +178,8 @@ public class CreditsModule extends JavaModule {
                 "jordan1986",
                 " ",
 
-                Colors.Red + "And....",
-                Colors.LightBlue + "Old Griefcraft server -- love you guys!",
+                ChatColor.DARK_RED + "And....",
+                ChatColor.AQUA + "Old Griefcraft server -- love you guys!",
                 "jobsti",
                 "Joy",
                 "KaneHart",
@@ -216,10 +216,10 @@ public class CreditsModule extends JavaModule {
                 "TnT",
                 " ",
 
-                Colors.Yellow + "To everyone else and anyone I missed....",
+                ChatColor.YELLOW + "To everyone else and anyone I missed....",
                 "LWC would not be the awesome plugin it is today if not also for those not listed",
                 " ",
-                Colors.Blue + "THANK YOU!"
+                ChatColor.BLUE + "THANK YOU!"
         };
 
         // not using the bukkit scheduler because tick rates vary from server to server

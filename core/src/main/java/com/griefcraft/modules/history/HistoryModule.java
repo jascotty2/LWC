@@ -25,7 +25,6 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Tyler Blair.
  */
-
 package com.griefcraft.modules.history;
 
 import com.griefcraft.lwc.LWC;
@@ -37,7 +36,6 @@ import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCBlockInteractEvent;
 import com.griefcraft.scripting.event.LWCCommandEvent;
 import com.griefcraft.scripting.event.LWCProtectionInteractEvent;
-import com.griefcraft.util.Colors;
 import com.griefcraft.util.TimeUtil;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -45,6 +43,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Date;
 import java.util.List;
+import org.bukkit.ChatColor;
 
 public class HistoryModule extends JavaModule {
 
@@ -107,7 +106,7 @@ public class HistoryModule extends JavaModule {
         Action action = lwcPlayer.getAction("history");
 
         if (action == null) {
-            player.sendMessage(Colors.Red + "History action is null!");
+            player.sendMessage(ChatColor.DARK_RED + "History action is null!");
             return;
         }
 
@@ -115,7 +114,7 @@ public class HistoryModule extends JavaModule {
         int page = Integer.parseInt(action.getData());
 
         // load the history objects for the protection
-        List<History> relatedHistory = null;
+        List<History> relatedHistory;
 
         if (lwc.isAdmin(player)) {
             relatedHistory = lwc.getPhysicalDatabase().loadHistory(x, y, z);
@@ -128,7 +127,7 @@ public class HistoryModule extends JavaModule {
         }
 
         // No results
-        if (relatedHistory.size() == 0) {
+        if (relatedHistory.isEmpty()) {
             lwc.sendLocale(player, "lwc.noresults");
             return;
         }
@@ -219,7 +218,7 @@ public class HistoryModule extends JavaModule {
                     "discount",
                     // Rest your eyes and avoid the line two lines below
                     // Its format: Yes|No (ID)  -- (ID) is only shown if Yes is shown.
-                    ((history.hasKey("discount") ? (Colors.Red + "Yes") : (Colors.Yellow + "No")) + Colors.Yellow + " " + /* Discount id */ (history.hasKey("discountId") ? ("(" + history.getString("discountId") + ")") : "")));
+                    ((history.hasKey("discount") ? (ChatColor.DARK_RED + "Yes") : (ChatColor.YELLOW + "No")) + ChatColor.YELLOW + " " + /* Discount id */ (history.hasKey("discountId") ? ("(" + history.getString("discountId") + ")") : "")));
         }
 
         // Show the creation date
@@ -326,7 +325,7 @@ public class HistoryModule extends JavaModule {
         // Some vars we'll use more later on
         boolean isWildcard = false;
         int page = 1;
-        int historyCount = 0;
+        int historyCount;
         int pageCount = 0;
 
         // If it's the console without arguments, lookup for every player
@@ -409,7 +408,7 @@ public class HistoryModule extends JavaModule {
         }
 
         // Were there any usable results?
-        if (relatedHistory.size() == 0) {
+        if (relatedHistory.isEmpty()) {
             lwc.sendLocale(sender, "lwc.noresults");
             return;
         }

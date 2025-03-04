@@ -25,17 +25,37 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.lwc;
 
-import com.griefcraft.util.Colors;
 import com.griefcraft.util.StringUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import org.bukkit.ChatColor;
 
 public class SimpleMessageParser implements MessageParser {
+
+    public static final Map<String, String> localeColors = new HashMap() {
+        {
+            put("%black%", ChatColor.BLACK.toString());
+            put("%navy%", ChatColor.DARK_BLUE.toString());
+            put("%green%", ChatColor.DARK_GREEN.toString());
+            put("%blue%", ChatColor.DARK_AQUA.toString());
+            put("%red%", ChatColor.DARK_RED.toString());
+            put("%purple%", ChatColor.DARK_PURPLE.toString());
+            put("%gold%", ChatColor.GOLD.toString());
+            put("%lightgray%", ChatColor.GRAY.toString());
+            put("%gray%", ChatColor.DARK_GRAY.toString());
+            put("%darkpurple%", ChatColor.BLUE.toString());
+            put("%lightgreen%", ChatColor.GREEN.toString());
+            put("%lightblue%", ChatColor.AQUA.toString());
+            put("%rose%", ChatColor.DARK_RED.toString());
+            put("%lightpurple%", ChatColor.LIGHT_PURPLE.toString());
+            put("%yellow%", ChatColor.YELLOW.toString());
+            put("%white%", ChatColor.WHITE.toString());
+        }
+    };
 
     /**
      * The i18n localization bundle
@@ -45,17 +65,18 @@ public class SimpleMessageParser implements MessageParser {
     /**
      * Cached messages
      */
-    private final Map<String, String> basicMessageCache = new HashMap<String, String>();
+    private final Map<String, String> basicMessageCache = new HashMap();
 
     /**
      * A heavy cache that includes binds.
      */
-    private final Map<String, String> bindMessageCache = new HashMap<String, String>();
+    private final Map<String, String> bindMessageCache = new HashMap();
 
     public SimpleMessageParser(ResourceBundle locale) {
         this.locale = locale;
     }
 
+    @Override
     public String parseMessage(String key, Object... args) {
         key = StringUtil.fastReplace(key, ' ', '_');
 
@@ -84,8 +105,8 @@ public class SimpleMessageParser implements MessageParser {
             value = locale.getString(key);
 
             // apply colors
-            for (String colorKey : Colors.localeColors.keySet()) {
-                String color = Colors.localeColors.get(colorKey);
+            for (String colorKey : localeColors.keySet()) {
+                String color = localeColors.get(colorKey);
 
                 if (value.contains(colorKey)) {
                     value = StringUtil.fastReplace(value, colorKey, color);
@@ -124,13 +145,15 @@ public class SimpleMessageParser implements MessageParser {
     }
 
     /**
-     * Convert an even-lengthed argument array to a map containing String keys i.e parseBinds("Test", null, "Test2", obj) = Map().put("test", null).put("test2", obj)
+     * Convert an even-lengthed argument array to a map containing String keys
+     * i.e parseBinds("Test", null, "Test2", obj) = Map().put("test",
+     * null).put("test2", obj)
      *
      * @param args
      * @return
      */
     private Map<String, Object> parseBinds(Object... args) {
-        Map<String, Object> bind = new HashMap<String, Object>();
+        Map<String, Object> bind = new HashMap();
 
         if (args == null || args.length < 2) {
             return bind;

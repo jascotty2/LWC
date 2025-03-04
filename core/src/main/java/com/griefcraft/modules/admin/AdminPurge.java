@@ -75,7 +75,7 @@ public class AdminPurge extends JavaModule {
 
             UUID toRemoveUuid = UUIDRegistry.getUUID(toRemoveName); // This will return a UUID associated with a name, or a UUID object for a UUID string
             if (toRemoveUuid == null) {
-                sender.sendMessage(ChatColor.RED + "Player \"" + toRemoveName + "\" not found!");
+                sender.sendMessage(ChatColor.DARK_RED + "Player \"" + toRemoveName + "\" not found!");
                 continue;
             }
 

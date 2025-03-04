@@ -34,7 +34,6 @@ import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCCommandEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
 import com.griefcraft.scripting.event.LWCReloadEvent;
-import com.griefcraft.util.Colors;
 import com.griefcraft.util.config.Configuration;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -47,6 +46,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.ChatColor;
 
 public class LimitsV2 extends JavaModule {
 
@@ -311,7 +311,7 @@ public class LimitsV2 extends JavaModule {
 
         if (args.length == 0) {
             if (args.length == 0 && !(sender instanceof Player)) {
-                sender.sendMessage(Colors.Red + "You are not a player!");
+                sender.sendMessage(ChatColor.DARK_RED + "You are not a player!");
                 return;
             }
 
@@ -328,7 +328,7 @@ public class LimitsV2 extends JavaModule {
         Player player = lwc.getPlugin().getServer().getPlayer(playerName);
 
         if (player == null) {
-            sender.sendMessage(Colors.Red + "That player is not online!");
+            sender.sendMessage(ChatColor.DARK_RED + "That player is not online!");
             return;
         }
 
@@ -368,11 +368,11 @@ public class LimitsV2 extends JavaModule {
             }
 
             String stringLimit = limit.getLimit() == UNLIMITED ? "Unlimited" : Integer.toString(limit.getLimit());
-            String colour = Colors.Yellow;
+            String colour = ChatColor.YELLOW.toString();
 
             if (target != null) {
                 boolean reachedLimit = hasReachedLimit(target, limit.getTypeName());
-                colour = reachedLimit ? Colors.Red : Colors.Green;
+                colour = reachedLimit ? ChatColor.DARK_RED.toString() : ChatColor.DARK_GREEN.toString();
             }
 
             String currentProtected = target != null ? (Integer.toString(limit.getProtectionCount(target)) + "/") : "";
@@ -387,7 +387,7 @@ public class LimitsV2 extends JavaModule {
             } else if (limit instanceof SignLimit) {
                 sender.sendMessage("Sign: " + colour + currentProtected + stringLimit);
             } else {
-                sender.sendMessage(limit.getClass().getSimpleName() + ": " + Colors.Yellow + stringLimit);
+                sender.sendMessage(limit.getClass().getSimpleName() + ": " + ChatColor.YELLOW + stringLimit);
             }
 
         }

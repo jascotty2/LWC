@@ -32,7 +32,7 @@ import com.griefcraft.cache.ProtectionCache;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCCommandEvent;
-import com.griefcraft.util.Colors;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class AdminCache extends JavaModule {
@@ -70,7 +70,7 @@ public class AdminCache extends JavaModule {
             int size = cache.size();
             int capacity = cache.capacity();
 
-            sender.sendMessage(Colors.Green + size + Colors.Yellow + "/" + Colors.Green + capacity);
+            sender.sendMessage(ChatColor.DARK_GREEN.toString() + size + ChatColor.YELLOW + "/" + ChatColor.DARK_GREEN + capacity);
         }
     }
 

@@ -32,7 +32,10 @@ import com.griefcraft.bukkit.EntityBlock;
 import com.griefcraft.cache.ProtectionCache;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.event.LWCProtectionRemovePostEvent;
-import com.griefcraft.util.*;
+import com.griefcraft.util.ProtectionFinder;
+import com.griefcraft.util.StringUtil;
+import com.griefcraft.util.TimeUtil;
+import com.griefcraft.util.UUIDRegistry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -52,6 +55,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import org.bukkit.ChatColor;
 
 public class Protection {
 
@@ -315,8 +319,6 @@ public class Protection {
 
     /**
      * Encode the AccessRights to JSON
-     *
-     * @return
      */
     public void encodeRights() {
         // create the root
@@ -530,7 +532,7 @@ public class Protection {
      * @return the list of permissions
      */
     public List<Permission> getPermissions() {
-        return Collections.unmodifiableList(new ArrayList<Permission>(permissions));
+        return Collections.unmodifiableList(new ArrayList(permissions));
     }
 
     /**
@@ -982,7 +984,7 @@ public class Protection {
             lastAccessed += " ago";
         }
 
-        return String.format("%s %s" + Colors.White + " " + Colors.Green
+        return String.format("%s %s" + ChatColor.WHITE + " " + ChatColor.DARK_GREEN
                 + "Id=%d Owner=%s Location=[%s %d,%d,%d] Created=%s Flags=%s LastAccessed=%s", 
                 typeToString(), (blockType == null ? "Not yet cached" : blockType), 
                 id, owner, world, x, y, z, creation, flagStr, lastAccessed);

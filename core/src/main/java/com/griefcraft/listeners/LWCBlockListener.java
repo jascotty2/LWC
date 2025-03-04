@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.listeners;
 
 import java.util.ArrayList;
@@ -42,8 +41,9 @@ import com.griefcraft.scripting.event.LWCProtectionDestroyEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegistrationPostEvent;
 import com.griefcraft.scripting.event.LWCRedstoneEvent;
-import com.griefcraft.util.Colors;
 import com.griefcraft.util.matchers.DoubleChestMatcher;
+import java.util.logging.Level;
+import org.bukkit.ChatColor;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -188,7 +188,7 @@ public class LWCBlockListener implements Listener {
         // in the event they're trying to destroy a double chest, we should just move
         // the protection to the chest that is not destroyed, if it is not that one already.
         if (protection.isOwner(player) && DoubleChestMatcher.PROTECTABLES_CHESTS.contains(block.getType())) {
-            Block doubleChest = lwc.findAdjacentDoubleChest(block);
+            Block doubleChest = LWC.findAdjacentDoubleChest(block);
 
             if (doubleChest != null) {
                 // if they destroyed the protected block we want to move it aye?
@@ -224,10 +224,10 @@ public class LWCBlockListener implements Listener {
         } catch (Exception e) {
             event.setCancelled(true);
             lwc.sendLocale(player, "protection.internalerror", "id", "BLOCK_BREAK");
-            e.printStackTrace();
+            lwc.getPlugin().getLogger().log(Level.SEVERE, "Protections error for BLOCK_BREAK:", e);
         }
     }
-    
+
     @EventHandler
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
         if (!LWC.ENABLED || event.isCancelled()) {
@@ -278,7 +278,7 @@ public class LWCBlockListener implements Listener {
             for (Protection protection : lwc.findAdjacentProtectionsOnAllSides(block)) {
                 if (protection != null) {
                     // double-check protection is valid
-                    if(!protection.isBlockInWorld()) {
+                    if (!protection.isBlockInWorld()) {
                         protection.remove();
                     } else {
                         // is this protecting a block with an inventory?
@@ -329,7 +329,7 @@ public class LWCBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             // also check if the hopper is pointing into a protection
             Hopper hopperData = (Hopper) block.getBlockData();
             Block target = block.getRelative(hopperData.getFacing());
@@ -339,7 +339,7 @@ public class LWCBlockListener implements Listener {
             }
         }
     }
-    
+
     private boolean checkForHopperProtection(Player player, Block block) {
         if (block.getState() instanceof InventoryHolder) { // only care if block has an inventory
             LWC lwc = plugin.getLWC();
@@ -400,8 +400,9 @@ public class LWCBlockListener implements Listener {
         if (current != null && current.getX() == block.getX() && current.getZ() == block.getZ()) {
             // no use checking if the block id matches.
             // except for an odd glitch with lecterns.
-            if(block.getType().name().equals("LECTERN") && current.getBlockType().name().equals("LECTERN"))
+            if (block.getType().name().equals("LECTERN") && current.getBlockType().name().equals("LECTERN")) {
                 return;
+            }
             // This is a build event because it didn't exist before, and does now
             //lwc.log("Removing corrupted protection: " + current);
             current.remove();
@@ -434,7 +435,7 @@ public class LWCBlockListener implements Listener {
 
         // Is it okay?
         if (type == null) {
-            player.sendMessage(Colors.Red + "LWC_INVALID_CONFIG_autoRegister");
+            player.sendMessage(ChatColor.DARK_RED + "LWC_INVALID_CONFIG_autoRegister");
             return;
         }
 
@@ -468,10 +469,10 @@ public class LWCBlockListener implements Listener {
             }
         } catch (Exception e) {
             lwc.sendLocale(player, "protection.internalerror", "id", "PLAYER_INTERACT");
-            e.printStackTrace();
+            lwc.getPlugin().getLogger().log(Level.SEVERE, "Protections error for PLAYER_INTERACT:", e);
         }
     }
-    
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         if (!LWC.ENABLED) {
@@ -501,22 +502,21 @@ public class LWCBlockListener implements Listener {
             try {
                 String[] idParts = sId.trim().split(":");
                 Material material = Material.matchMaterial(idParts[0].trim());
-                if(material == null && idParts[0].trim().matches("^[0-9]+$")) {
+                if (material == null && idParts[0].trim().matches("^[0-9]+$")) {
                     int id = Integer.parseInt(idParts[0].trim());
-                    for(Material mat : Material.values()) {
-                        if(mat.getId() == id) {
+                    for (Material mat : Material.values()) {
+                        if (mat.getId() == id) {
                             material = mat;
                             break;
                         }
                     }
                 }
-                if(material == null) {
+                if (material == null) {
                     continue;
                 }
-            blacklistedBlocks.add(material);
+                blacklistedBlocks.add(material);
             } catch (Exception ex) {
-                LWC.getInstance().log("Failed to parse \"" + sId + "\" from optional.blacklistedBlocks:");
-                ex.printStackTrace();
+                LWC.getInstance().getPlugin().getLogger().log(Level.SEVERE, "Failed to parse \"" + sId + "\" from optional.blacklistedBlocks:", ex);
             }
         }
     }

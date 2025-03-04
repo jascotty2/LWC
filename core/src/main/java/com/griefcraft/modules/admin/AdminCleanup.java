@@ -34,8 +34,9 @@ import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCCommandEvent;
 import com.griefcraft.sql.Database;
 import com.griefcraft.sql.PhysDB;
-import com.griefcraft.util.Colors;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -55,7 +56,7 @@ public class AdminCleanup extends JavaModule {
     /**
      * The amount of protection block gets to batch at once
      */
-    private static int BATCH_SIZE = 250;
+    private static final int BATCH_SIZE = 250;
 
     @Override
     public void onCommand(LWCCommandEvent event) {
@@ -97,9 +98,9 @@ public class AdminCleanup extends JavaModule {
      */
     private static class Admin_Cleanup_Thread implements Runnable {
 
-        private LWC lwc;
-        private CommandSender sender;
-        private boolean silent;
+        private final LWC lwc;
+        private final CommandSender sender;
+        private final boolean silent;
 
         public Admin_Cleanup_Thread(LWC lwc, CommandSender sender, boolean silent) {
             this.lwc = lwc;
@@ -140,7 +141,7 @@ public class AdminCleanup extends JavaModule {
                     statement.executeUpdate(builder.toString());
                     builder.setLength(0);
 
-                    sender.sendMessage(Colors.Green + "REMOVED " + (count + 1) + " / " + total);
+                    sender.sendMessage(ChatColor.DARK_GREEN + "REMOVED " + (count + 1) + " / " + total);
                 }
 
                 count++;
@@ -158,7 +159,7 @@ public class AdminCleanup extends JavaModule {
             BukkitScheduler scheduler = Bukkit.getScheduler();
 
             try {
-                sender.sendMessage(Colors.Red + "Processing cleanup request now in a separate thread");
+                sender.sendMessage(ChatColor.DARK_RED + "Processing cleanup request now in a separate thread");
 
                 // the list of protections work off of. We batch updates to the world
                 // so we can more than 20 results/second.
@@ -230,7 +231,7 @@ public class AdminCleanup extends JavaModule {
 
                     if (percent % 5 == 0 && percentChecked != percent) {
                         percentChecked = percent;
-                        sender.sendMessage(Colors.Red + "Cleanup @ " + percent + "% [ " + checked + "/" + totalProtections + " protections ] [ removed " + removed + " protections ]");
+                        sender.sendMessage(ChatColor.DARK_RED + "Cleanup @ " + percent + "% [ " + checked + "/" + totalProtections + " protections ] [ removed " + removed + " protections ]");
                     }
 
                     // Clear the protection set, we are done with them

@@ -52,6 +52,7 @@ import org.bukkit.command.CommandSender;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import org.bukkit.ChatColor;
 
 /**
  * Simple stop watch, allowing for timing of a number of tasks, exposing total
@@ -241,7 +242,7 @@ public class StopWatch {
      * Return a short description of the total running time.
      */
     public String shortSummary() {
-        return "" + this.id + ": " + Colors.Yellow + getTotalTimeMillis() + " ms";
+        return "" + this.id + ": " + ChatColor.YELLOW + getTotalTimeMillis() + " ms";
     }
 
     /**

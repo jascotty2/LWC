@@ -25,20 +25,19 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.modules.setup;
 
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.modules.limits.LimitsV2;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCCommandEvent;
-import com.griefcraft.util.Colors;
 import com.griefcraft.util.config.Configuration;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import org.bukkit.ChatColor;
 
 public class LimitsSetup extends JavaModule {
 
@@ -87,7 +86,7 @@ public class LimitsSetup extends JavaModule {
                     Player target = lwc.getPlugin().getServer().getPlayer(name);
 
                     if (found == null) {
-                        sender.sendMessage(Colors.Red + "Player override not found.");
+                        sender.sendMessage(ChatColor.DARK_RED + "Player override not found.");
                     } else {
                         limits.sendLimits(sender, target, found);
                     }
@@ -95,7 +94,7 @@ public class LimitsSetup extends JavaModule {
                     List<LimitsV2.Limit> found = limits.getGroupLimits().get(name);
 
                     if (found == null) {
-                        sender.sendMessage(Colors.Red + "Group override not found.");
+                        sender.sendMessage(ChatColor.DARK_RED + "Group override not found.");
                     } else {
                         limits.sendLimits(sender, null, found);
                     }
@@ -126,7 +125,7 @@ public class LimitsSetup extends JavaModule {
                         try {
                             value = Integer.parseInt(args[2]);
                         } catch (NumberFormatException e) {
-                            sender.sendMessage(Colors.Red + "Invalid number for \"" + args[2] + "\"");
+                            sender.sendMessage(ChatColor.DARK_RED + "Invalid number for \"" + args[2] + "\"");
                             return;
                         }
                     }
@@ -152,7 +151,7 @@ public class LimitsSetup extends JavaModule {
                                 // attempt to parse it as an integer (it must always be one)
                                 intValue = Integer.parseInt(value);
                             } catch (NumberFormatException e) {
-                                sender.sendMessage(Colors.Red + "Invalid number for: \"" + value + "\"!");
+                                sender.sendMessage(ChatColor.DARK_RED + "Invalid number for: \"" + value + "\"!");
                                 return;
                             }
                         }
@@ -165,7 +164,7 @@ public class LimitsSetup extends JavaModule {
                             // it should be a material
                             Material material = Material.getMaterial(key.toUpperCase());
                             if (material == null) {
-                                sender.sendMessage(Colors.Red + "Invalid material/block: \"" + value + "\"!");
+                                sender.sendMessage(ChatColor.DARK_RED + "Invalid material/block: \"" + value + "\"!");
                                 return;
                             }
 
@@ -180,7 +179,7 @@ public class LimitsSetup extends JavaModule {
                 if (modified) {
                     configuration.save();
                     limits.reload();
-                    sender.sendMessage(Colors.Green + "Set the limits for \"" + name + "\" successfully.");
+                    sender.sendMessage(ChatColor.DARK_GREEN + "Set the limits for \"" + name + "\" successfully.");
                 }
             }
 
@@ -202,7 +201,8 @@ public class LimitsSetup extends JavaModule {
                     return key;
                 }
             }
-        } catch (NullPointerException e) { }
+        } catch (NullPointerException e) {
+        }
 
         // Not found, so we assume we're creating a new one
         return player;

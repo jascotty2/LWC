@@ -34,7 +34,7 @@ import com.griefcraft.lwc.MessageParser;
 import com.griefcraft.model.Flag;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCCommandEvent;
-import com.griefcraft.util.Colors;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -80,7 +80,7 @@ public class DebugModule extends JavaModule {
         Player player = (Player) sender;
 
         player.sendMessage(" ");
-        player.sendMessage(Colors.Gray + "LWC: " + LWCInfo.FULL_VERSION);
+        player.sendMessage(ChatColor.DARK_GRAY + "LWC: " + LWCInfo.FULL_VERSION);
         player.sendMessage(" ");
         player.sendMessage("Groups => " + lwc.getPermissions().getGroups(player));
         lwc.sendLocale(player, "lwc.debug.standard");

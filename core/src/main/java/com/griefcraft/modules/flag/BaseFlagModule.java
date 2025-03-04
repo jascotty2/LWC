@@ -36,8 +36,8 @@ import com.griefcraft.model.Protection;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCCommandEvent;
 import com.griefcraft.scripting.event.LWCProtectionInteractEvent;
-import com.griefcraft.util.Colors;
 import com.griefcraft.util.StringUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class BaseFlagModule extends JavaModule {
@@ -114,7 +114,7 @@ public class BaseFlagModule extends JavaModule {
             // TODO
             String flags = "";
             for (Flag.Type type : Flag.Type.values()) {
-                flags += Colors.Yellow + type.toString().toLowerCase() + Colors.White + ", ";
+                flags += ChatColor.YELLOW + type.toString().toLowerCase() + ChatColor.WHITE + ", ";
             }
             flags = flags.substring(0, flags.length() - 2);
 
