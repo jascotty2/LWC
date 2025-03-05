@@ -25,24 +25,7 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.lwc;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
-import java.util.jar.JarFile;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import com.griefcraft.listeners.LWCBlockListener;
 import com.griefcraft.listeners.LWCEntityListener;
@@ -50,10 +33,28 @@ import com.griefcraft.listeners.LWCPlayerListener;
 import com.griefcraft.listeners.LWCServerListener;
 import com.griefcraft.scripting.event.LWCCommandEvent;
 import com.griefcraft.sql.Database;
+import com.griefcraft.util.Completions;
 import com.griefcraft.util.StringUtil;
 import com.griefcraft.util.locale.LWCResourceBundle;
 import com.griefcraft.util.locale.LocaleClassLoader;
 import com.griefcraft.util.locale.UTF8Control;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
+import java.util.jar.JarFile;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class LWCPlugin extends JavaPlugin {
 
@@ -66,11 +67,6 @@ public class LWCPlugin extends JavaPlugin {
      * The message parser to parse messages with
      */
     private MessageParser messageParser;
-
-    /**
-     * LWC updater
-     */
-    // private Updater updater;
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -181,9 +177,144 @@ public class LWCPlugin extends JavaPlugin {
             return true;
         }
 
-        return false;
+        // Prevent Bukkit from handling the error which gives a non-descript "/lwc"
+        lwc.sendLocale(sender, "lwc.invalidcommand");
+        return true;
     }
 
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        String currentArg = args[args.length - 1];
+        switch (label) {
+            case "lwc":
+                if (args.length >= 1) {
+                    switch (args[0].toLowerCase()) {
+                        case "create":
+                            if (args.length == 2) {
+                                return Completions.protectionTypes(currentArg);
+                            } else if (args.length > 2 && ("public".equals(args[1].toLowerCase()) || "password".equals(args[1].toLowerCase()))) {
+                                break;
+                            }
+                            return Completions.cmodify(currentArg, sender, false);
+                        case "modify":
+                        case "default":
+                            if (args.length >= 2 && Completions.protectionTypes().contains(args[1].toLowerCase())) {
+                                break;
+                            }
+                            return Completions.cmodify(currentArg, sender, args.length == 2);
+                        case "limits":
+                            if (lwc.isAdmin(sender)) {
+                                return Completions.players(currentArg, sender);
+                            }
+                            break;
+                        case "remove":
+                            return Completions.remove(currentArg);
+                        case "mode":
+                            if (args.length == 2) {
+                                return Completions.modes(currentArg);
+                            } else if (args.length == 3 && "droptransfer".equals(args[1].toLowerCase())) {
+                                return Completions.droptransfer(currentArg);
+                            }
+                            break;
+                        case "flag":
+                            if (args.length == 2) {
+                                return Completions.flags(currentArg);
+                            } else if (args.length == 3) {
+                                return Completions.toggles(currentArg);
+                            }
+                            break;
+                        case "admin":
+                            if (lwc.isAdmin(sender)) {
+                                if (args.length == 2) {
+                                    return Completions.admin(currentArg);
+                                } else if (args.length > 2) {
+                                    return onTabCompleteAdmin(sender, Arrays.copyOfRange(args, 1, args.length));
+                                }
+                            }
+                            break;
+                        default:
+                            if (args.length == 1) {
+                                return Completions.lwc(currentArg);
+                            }
+                            break;
+                    }
+                }
+                break;
+            case "lock":
+                return Completions.cmodify(currentArg, sender, false);
+            case "cadmin":
+                if (lwc.isAdmin(sender)) {
+                    if (args.length == 1) {
+                        return Completions.admin(currentArg);
+                    }
+                    return onTabCompleteAdmin(sender, args);
+                }
+                break;
+            case "cmodify":
+            case "cdefault":
+                if (args.length >= 1 && Completions.protectionTypes().contains(args[0].toLowerCase())) {
+                    break;
+                }
+                return Completions.cmodify(currentArg, sender, args.length == 1);
+            case "climits":
+                if (lwc.isAdmin(sender)) {
+                    return Completions.players(currentArg, sender);
+                }
+                break;
+            case "cdroptransfer":
+                if (args.length == 1) {
+                    return Completions.droptransfer(currentArg);
+                }
+                break;
+            case "credstone":
+            case "cmagnet":
+            case "cexempt":
+            case "cautoclose":
+            case "callowexplosions":
+            case "chopper":
+            case "ctnt":
+                if (args.length == 1) {
+                    return Completions.toggles(currentArg);
+                }
+                break;
+            default:
+                break;
+        }
+        return Collections.emptyList();
+    }
+
+    private List<String> onTabCompleteAdmin(CommandSender sender, String[] args) {
+        String currentArg = args[args.length - 1];
+        if (args.length >= 1) {
+            switch (args[0].toLowerCase()) {
+                case "view":
+                    if (args.length == 2) {
+                        return Completions.integers(currentArg);
+                    }
+                    break;
+                case "find":
+                case "forceowner":
+                    if (args.length == 2) {
+                        return Completions.players(currentArg, sender);
+                    } else if (args.length == 3) {
+                        return Completions.integers(currentArg);
+                    }
+                    break;
+                case "remove":
+                    if (args.length == 2) {
+                        return Completions.integers(currentArg);
+                    }
+                    break;
+                case "purge":
+                    return Completions.players(currentArg, sender);
+                default:
+                    break;
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
     public void onDisable() {
         LWC.ENABLED = false;
 
@@ -195,6 +326,7 @@ public class LWCPlugin extends JavaPlugin {
         getServer().getScheduler().cancelTasks(this);
     }
 
+    @Override
     public void onEnable() {
         // preload();
         lwc = new LWC(this);
@@ -208,7 +340,7 @@ public class LWCPlugin extends JavaPlugin {
         // Load the rest of LWC
         lwc.load();
 
-        if(this.isEnabled()) {
+        if (this.isEnabled()) {
             try {
                 registerEvents();
             } catch (NoSuchFieldError e) {
@@ -297,7 +429,6 @@ public class LWCPlugin extends JavaPlugin {
             System.setProperty("org.sqlite.lib.path", nativeLibraryFolder);
         }
     } */
-
     /**
      * Log a string to the console
      *
@@ -334,6 +465,7 @@ public class LWCPlugin extends JavaPlugin {
 
     /**
      * Gets the message parser
+     *
      * @return
      */
     public MessageParser getMessageParser() {
@@ -346,7 +478,6 @@ public class LWCPlugin extends JavaPlugin {
     /* public Updater getUpdater() {
         return updater;
     } */
-
     @Override
     public File getFile() {
         return super.getFile();
