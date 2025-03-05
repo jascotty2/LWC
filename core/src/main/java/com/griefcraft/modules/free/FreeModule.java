@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.modules.free;
 
 import com.griefcraft.lwc.LWC;
@@ -157,17 +156,15 @@ public class FreeModule extends JavaModule {
             lwc.sendLocale(player, "lwc.remove.allprotections");
 
             // our callback (remove all of their protections :p)
-            Runnable callback = new Runnable() {
-                public void run() {
-                    // Get all of the player's protections
-                    for (Protection protection : lwc.getPhysicalDatabase().loadProtectionsByPlayer(player.getUniqueId().toString())) {
-                        // Remove the protection
-                        protection.remove();
-                    }
-
-                    // Notify them
-                    lwc.sendLocale(player, "lwc.remove.allprotections.success");
+            Runnable callback = () -> {
+                // Get all of the player's protections
+                for (Protection protection : lwc.getPhysicalDatabase().loadProtectionsByPlayer(player.getUniqueId().toString())) {
+                    // Remove the protection
+                    protection.remove();
                 }
+
+                // Notify them
+                lwc.sendLocale(player, "lwc.remove.allprotections.success");
             };
 
             // Create the action

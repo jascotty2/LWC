@@ -28,14 +28,6 @@
 
 package com.griefcraft.modules.doors;
 
-import org.bukkit.Effect;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.Door;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.model.Flag;
 import com.griefcraft.model.Protection;
@@ -43,8 +35,14 @@ import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCProtectionInteractEvent;
 import com.griefcraft.util.config.Configuration;
 import com.griefcraft.util.matchers.DoorMatcher;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Door;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 
 public class DoorsModule extends JavaModule {
 
@@ -163,8 +161,6 @@ public class DoorsModule extends JavaModule {
                 !block.getType().name().contains("IRON");
         changeDoorStates(true, (opensWhenClicked ? null : block), doubleDoorBlock);
 
-        // TODO Keep double doors in sync
-
         if (action == Action.OPEN_AND_CLOSE || protection.hasFlag(Flag.Type.AUTOCLOSE)) {
             // Abuse the fact that we still use final variables inside the task
             // The double door block object is initially only assigned if we need
@@ -178,14 +174,10 @@ public class DoorsModule extends JavaModule {
 
             // Create the task
             // If we are set to close the door after a set period, let's create a sync task for it
-            lwc.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(lwc.getPlugin(), new Runnable() {
-                public void run() {
-
-                    // Essentially all we need to do is reset the door states
-                    // But DO NOT open the door if it's closed !
-                    changeDoorStates(false, finalBlock, finalDoubleDoorBlock);
-
-                }
+            lwc.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(lwc.getPlugin(), () -> {
+                // Essentially all we need to do is reset the door states
+                // But DO NOT open the door if it's closed !
+                changeDoorStates(false, finalBlock, finalDoubleDoorBlock);
             }, wait);
         }
 
@@ -213,8 +205,7 @@ public class DoorsModule extends JavaModule {
 
             // Get the top half of the door
             Block topHalf = door.getRelative(BlockFace.UP);
-            if (topHalf.getBlockData() instanceof Door) {
-                Door topData = (Door) topHalf.getBlockData();
+            if (topHalf.getBlockData() instanceof Door topData) {
                 topData.setOpen(!data.isOpen());
                 topHalf.setBlockData(topData);
             }
