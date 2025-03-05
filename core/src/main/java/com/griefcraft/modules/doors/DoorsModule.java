@@ -43,6 +43,7 @@ import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCProtectionInteractEvent;
 import com.griefcraft.util.config.Configuration;
 import com.griefcraft.util.matchers.DoorMatcher;
+import org.bukkit.Sound;
 import org.bukkit.block.data.BlockData;
 
 public class DoorsModule extends JavaModule {
@@ -222,7 +223,24 @@ public class DoorsModule extends JavaModule {
             door.setBlockData(data);
 
             // Play the door open/close sound
-            door.getWorld().playEffect(door.getLocation(), Effect.DOOR_TOGGLE, 0);
+            //door.getWorld().playEffect(door.getLocation(), Effect.DOOR_TOGGLE, 0);
+            // 1.20+ sounds:
+            if (Material.IRON_DOOR.equals(door.getType())) {
+                door.getWorld().playSound(door.getLocation(),
+                        data.isOpen() ? Sound.BLOCK_IRON_DOOR_OPEN : Sound.BLOCK_IRON_DOOR_CLOSE, 1, 1);
+            } else if (DoorMatcher.DOORS.contains(door.getType())) {
+                door.getWorld().playSound(door.getLocation(),
+                        data.isOpen() ? Sound.BLOCK_WOODEN_DOOR_OPEN : Sound.BLOCK_WOODEN_DOOR_CLOSE, 1, 1);
+            } else if (Material.IRON_TRAPDOOR.equals(door.getType())) {
+                door.getWorld().playSound(door.getLocation(),
+                        data.isOpen() ? Sound.BLOCK_IRON_TRAPDOOR_OPEN : Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 1);
+            } else if (DoorMatcher.DOORS.contains(door.getType())) {
+                door.getWorld().playSound(door.getLocation(),
+                        data.isOpen() ? Sound.BLOCK_WOODEN_TRAPDOOR_OPEN : Sound.BLOCK_WOODEN_TRAPDOOR_CLOSE, 1, 1);
+            } else if (DoorMatcher.FENCE_GATES.contains(door.getType())) {
+                door.getWorld().playSound(door.getLocation(),
+                        data.isOpen() ? Sound.BLOCK_FENCE_GATE_OPEN : Sound.BLOCK_FENCE_GATE_CLOSE, 1, 1);
+            }
         }
     }
 
