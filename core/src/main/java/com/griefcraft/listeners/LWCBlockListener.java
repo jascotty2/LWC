@@ -506,6 +506,16 @@ public class LWCBlockListener implements Listener {
 
         Protection protection = lwc.findProtection(block);
         if (protection != null) {
+
+            if (event.getEntity() instanceof Player player) {
+                boolean canAccess = lwc.canAccessProtection(player, protection);
+                if (!canAccess) {
+                    event.setCancelled(true);
+                }
+                return;
+            }
+
+            // deny from all non-players if there is a protection here
             event.setCancelled(true);
         }
     }
