@@ -318,6 +318,7 @@ public class LWCBlockListener implements Listener {
                             case GREEN_SHULKER_BOX:
                             case RED_SHULKER_BOX:
                             case BLACK_SHULKER_BOX:
+                            case CHISELED_BOOKSHELF:
                                 if (!lwc.canAccessProtection(player, protection)
                                         || ((protection.getType() == Protection.Type.DONATION
                                         || protection.getType() == Protection.Type.SUPPLY

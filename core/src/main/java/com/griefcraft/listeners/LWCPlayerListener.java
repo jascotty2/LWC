@@ -50,6 +50,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.ChiseledBookshelf;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Hopper;
 import org.bukkit.enchantments.Enchantment;
@@ -93,6 +94,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.util.Vector;
 
 public class LWCPlayerListener implements Listener {
 
@@ -305,6 +307,30 @@ public class LWCPlayerListener implements Listener {
 
             Module.Result result;
             boolean canAccess = lwc.canAccessProtection(player, protection);
+            
+            // modify canAccess if this is a Chiseled Bookshelf for donation/supply types
+            if (canAccess && CHISELED_BOOKSHELF != null
+                    && CHISELED_BOOKSHELF.equals(block.getType())
+                    && block.getState() instanceof ChiseledBookshelf
+                    && block.getBlockData() instanceof org.bukkit.block.data.type.ChiseledBookshelf) {
+                final ChiseledBookshelf chiseledBookshelf = (ChiseledBookshelf) block.getState();
+                final org.bukkit.block.data.type.ChiseledBookshelf chiseledBookshelfBlockData = (org.bukkit.block.data.type.ChiseledBookshelf) block.getBlockData();
+                if (chiseledBookshelfBlockData.getFacing() == event.getBlockFace()) {
+                    final Vector clickedPosition = event.getClickedPosition();
+                    if (clickedPosition != null) {
+                        final int slot = chiseledBookshelf.getSlot(clickedPosition);
+                        final boolean isOccupied = chiseledBookshelfBlockData.isSlotOccupied(slot);
+                        if (protection != null && !protection.isOwner(event.getPlayer()) && protection.getType() != Protection.Type.PUBLIC && !lwc.canAdminProtection(player, protection)) {
+                            final Protection.Type type = protection.getType();
+                            if (isOccupied) {
+                                canAccess = Protection.Type.SUPPLY.equals(type);
+                            } else {
+                                canAccess = Protection.Type.DONATION.equals(type);
+                            }
+                        }
+                    }
+                }
+            }
             
 			if(!usingMainHand) {
 				result = Module.Result.DEFAULT;
