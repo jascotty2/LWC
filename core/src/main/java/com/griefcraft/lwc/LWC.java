@@ -89,6 +89,7 @@ import com.griefcraft.modules.admin.AdminFind;
 import com.griefcraft.modules.admin.AdminFlush;
 import com.griefcraft.modules.admin.AdminForceOwner;
 import com.griefcraft.modules.admin.AdminLocale;
+import com.griefcraft.modules.admin.AdminOwnerAll;
 import com.griefcraft.modules.admin.AdminPurge;
 import com.griefcraft.modules.admin.AdminPurgeBanned;
 import com.griefcraft.modules.admin.AdminQuery;
@@ -1708,6 +1709,7 @@ public class LWC {
         registerModule(new AdminFind());
         registerModule(new AdminFlush());
         registerModule(new AdminForceOwner());
+        registerModule(new AdminOwnerAll());
         registerModule(new AdminLocale());
         registerModule(new AdminPurge());
         registerModule(new AdminReload());
