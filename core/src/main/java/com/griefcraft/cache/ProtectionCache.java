@@ -48,11 +48,6 @@ public class ProtectionCache {
     private final static int ADAPTIVE_CACHE_MAX = 100000;
 
     /**
-     * The LWC instance this set belongs to
-     */
-    private final LWC lwc;
-
-    /**
      * Hard references to protections still cached
      */
     private final LRUCache<Protection, Object> references;
@@ -80,7 +75,7 @@ public class ProtectionCache {
     /**
      * The capacity of the cache
      */
-    private int capacity;
+    private final int capacity;
 
     /**
      * The number of protections that were added via adaptive cache
@@ -98,14 +93,13 @@ public class ProtectionCache {
     private final static Object FAKE_VALUE = new Object();
 
     public ProtectionCache(LWC lwc) {
-        this.lwc = lwc;
         this.capacity = lwc.getConfiguration().getInt("core.cacheSize", 10000);
 
-        this.references = new LRUCache<Protection, Object>(capacity);
-        this.byCacheKey = new WeakLRUCache<String, Protection>(capacity);
-        this.byId = new WeakLRUCache<Integer, Protection>(capacity);
-        this.byKnownBlock = new WeakLRUCache<String, Protection>(capacity);
-        this.byKnownNulls = new LRUCache<String, Object>(Math.min(10000, capacity)); // enforce a min size so we have a known buffer
+        this.references = new LRUCache(capacity);
+        this.byCacheKey = new WeakLRUCache(capacity);
+        this.byId = new WeakLRUCache(capacity);
+        this.byKnownBlock = new WeakLRUCache(capacity);
+        this.byKnownNulls = new LRUCache(Math.min(10000, capacity)); // enforce a min size so we have a known buffer
     }
 
     /**

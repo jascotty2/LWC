@@ -29,6 +29,7 @@
 package com.griefcraft.listeners;
 
 import com.griefcraft.bukkit.EntityBlock;
+import com.griefcraft.integration.IPermissions;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
 import com.griefcraft.model.Flag;
@@ -42,6 +43,9 @@ import com.griefcraft.scripting.event.LWCEntityInteractEvent;
 import com.griefcraft.scripting.event.LWCProtectionDestroyEvent;
 import com.griefcraft.scripting.event.LWCProtectionInteractEvent;
 import com.griefcraft.util.UUIDRegistry;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -50,29 +54,17 @@ import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Hopper;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerTakeLecternBookEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -80,24 +72,35 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import org.bukkit.inventory.EquipmentSlot;
 
 public class LWCPlayerListener implements Listener {
 
     /**
      * The plugin instance
      */
-    private LWCPlugin plugin;
+    private final LWCPlugin plugin;
+    private static final Material CHISELED_BOOKSHELF = Material.getMaterial("CHISELED_BOOKSHELF");
 
     public LWCPlayerListener(LWCPlugin plugin) {
         this.plugin = plugin;
@@ -157,23 +160,24 @@ public class LWCPlayerListener implements Listener {
 		Block protectionSource;
 
         try {
-            if (holder instanceof BlockState) {
-                location = ((BlockState) holder).getLocation();
+            if (holder instanceof BlockState h) {
+                location = h.getLocation();
                 protectionSource = location.getBlock();
-            } else if (holder instanceof DoubleChest) {
-                location = ((DoubleChest) holder).getLocation();
+            } else if (holder instanceof DoubleChest h) {
+                location = h.getLocation();
                 protectionSource = location.getBlock();
-            } else if (holder instanceof Minecart) {
-                Minecart m = (Minecart) holder;
-                int A = EntityBlock.calcHash(m.getUniqueId().hashCode());
-                location = new Location(m.getWorld(), A, A, A);
-                protectionSource = new EntityBlock(m);
+            } else if (holder instanceof Minecart h) {
+                int A = EntityBlock.calcHash(h.getUniqueId().hashCode());
+                location = new Location(h.getWorld(), A, A, A);
+                protectionSource = new EntityBlock(h);
             } else {
                 return false;
             }
 
-            if (hopperHolder instanceof Hopper) {
-                hopperLocation = ((Hopper) hopperHolder).getLocation();
+            if (hopperHolder instanceof Hopper h) {
+                hopperLocation = h.getLocation();
+            } else if (hopperHolder instanceof HopperMinecart h) {
+                hopperLocation = h.getLocation();
             }
         } catch (Exception e) {
             return false;
@@ -301,7 +305,7 @@ public class LWCPlayerListener implements Listener {
 
             Module.Result result;
             boolean canAccess = lwc.canAccessProtection(player, protection);
-
+            
 			if(!usingMainHand) {
 				result = Module.Result.DEFAULT;
 			} else {
@@ -434,25 +438,22 @@ public class LWCPlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        LWC lwc = LWC.getInstance();
-
         if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
 
-        // Player interacting with the inventory
-        Player player = (Player) event.getWhoClicked();
-
-        // The inventory they are using
-        Inventory inventory = event.getInventory();
-
-        if (inventory == null || event.getSlot() < 0) {
+        if (event.getSlot() < 0) {
             return;
         }
 
+        LWC lwc = LWC.getInstance();
+
+        // Player interacting with the inventory
+        Player player = (Player) event.getWhoClicked();
+        
         // Location of the container
         Location location;
-        InventoryHolder holder = null;
+        InventoryHolder holder;
 		boolean holderIsEntity = false;
 
         try {
@@ -487,7 +488,24 @@ public class LWCPlayerListener implements Listener {
             return;
         }
 
-        if (event.getAction() != InventoryAction.COLLECT_TO_CURSOR) {
+		// Attempt to load the protection at that location
+		Protection protection = holderIsEntity
+				? lwc.getPhysicalDatabase().loadProtection(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ())
+				: lwc.findProtection(location);
+
+        // If no protection was found we can safely ignore it
+        if (protection == null) {
+            return;
+        }
+
+        // If it's not a donation, display or supply chest, ignore it
+        if (protection.getType() != Protection.Type.DONATION
+                && protection.getType() != Protection.Type.DISPLAY
+                && protection.getType() != Protection.Type.SUPPLY) {
+            return;
+        }
+        
+        if (protection.getType() == Protection.Type.DONATION && event.getAction() != InventoryAction.COLLECT_TO_CURSOR) {
             // If it's not a container, we don't want it
             if (event.getSlotType() != InventoryType.SlotType.CONTAINER) {
                 return;
@@ -531,34 +549,150 @@ public class LWCPlayerListener implements Listener {
                     return;
                 }
             }
+        } else if (protection.getType() == Protection.Type.SUPPLY) {
+            // We check furnace fuel slot because furnace should supply only its result.
+            if (event.getSlotType() != InventoryType.SlotType.FUEL) {
+                // Not furnace.
+                // We ignore those slot type:
+                // - outside of inventory ... nothing to check.
+                // - craft table result and furnace result... behaviour of these slots are like supply chest originally.
+                // - armor slot ... these slots should not appear when we see container inventory.
+                if (event.getSlotType() != InventoryType.SlotType.CONTAINER && event.getSlotType() != InventoryType.SlotType.QUICKBAR) {
+                    return;
+                }
+                boolean clickedTopInventory = isRawSlotInTopInventory(event.getView(), event.getRawSlot());
+                switch (event.getAction()) {
+                    // add or swap item in the slot.
+                    case PLACE_ALL:
+                    case PLACE_SOME:
+                    case PLACE_ONE:
+                    case SWAP_WITH_CURSOR:
+                        // check if a clicked slot is in top inventory.
+                        if (clickedTopInventory) {
+                            break;
+                        }
+                        return;
+                    // these actions can also swap items in supply chest.
+                    case HOTBAR_MOVE_AND_READD:
+                    case HOTBAR_SWAP:
+                        // check if a clicked slot is in top inventory and a hotbar item is empty.
+                        if (clickedTopInventory && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null) {
+                            break;
+                        }
+                        return;
+                    case MOVE_TO_OTHER_INVENTORY:
+                        // check if a clicked slot is in bottom inventory.
+                        if (!clickedTopInventory) {
+                            break;
+                        }
+                        return;
+                    // COLLECT_TO_CURSOR, PICKUP_ALL,
+                    // PICKUP_SOME, PICKUP_HALF,        -> players can pick up items from supply chest. ignore it.
+                    // PICKUP_ONE
+                    // DROP_ALL_SLOT, DROP_ONE_SLOT     -> players can drop items from supply chest. ignore it.
+                    // DROP_ALL_CURSOR, DROP_ONE_CURSOR -> these actions will not come here
+                    //                                     because OUTSIDE slot type is ignored above.
+                    // CLONE_STACK                      -> this action will not come here
+                    //                                     because CLONE_STACK is only for creative inventory.
+                    // NOTHING, UNKNOWN                 -> nothing to check.
+                    default:
+                        return;
+                }
+            }
         }
 
-		// Attempt to load the protection at that location
-		Protection protection = holderIsEntity
-				? lwc.getPhysicalDatabase().loadProtection(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ())
-				: lwc.findProtection(location);
+        // Can they admin it? (remove items/etc)
+        boolean canAdmin = lwc.canAdminProtection(player, protection);
+
+        // allow ACL users to open read-only chests
+        if (!canAdmin) {
+            canAdmin = protection.getAccess(player.getUniqueId().toString(), Permission.Type.PLAYER) == Permission.Access.PLAYER;
+        }
+        // extend ACL to include groups
+        if (!canAdmin) {
+            IPermissions permissions = lwc.getPermissions();
+            if (permissions != null) {
+                for (String groupName : permissions.getGroups(player)) {
+                    if (protection.getAccess(groupName, Permission.Type.GROUP) == Permission.Access.PLAYER) {
+                        canAdmin = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // nope.avi
+        if (!canAdmin) {
+            event.setCancelled(true);
+        }
+    }
+
+    // Mostly a copy of the inventory click event, but intended to disable dragging in display chests
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryDrag(InventoryDragEvent event) {
+        LWC lwc = LWC.getInstance();
+
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+
+        // Player interacting with the inventory
+        Player player = (Player) event.getWhoClicked();
+
+        // Location of the container
+        Location location;
+        InventoryHolder holder = null;
+
+        try {
+            holder = event.getInventory().getHolder();
+        } catch (AbstractMethodError e) {
+            e.printStackTrace();
+            return;
+        }
+
+        try {
+            if (holder instanceof BlockState) {
+                location = ((BlockState) holder).getLocation();
+            } else if (holder instanceof DoubleChest) {
+                location = ((DoubleChest) holder).getLocation();
+            } else {
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Attempt to load the protection at that location
+        Protection protection = lwc.findProtection(location);
 
         // If no protection was found we can safely ignore it
         if (protection == null) {
             return;
         }
 
-        // If it's not a donation chest, ignore it
-        if (protection.getType() != Protection.Type.DONATION) {
-            return;
-        }
+        // If it's a display chest, check permission.
+        if (protection.getType() == Protection.Type.DISPLAY) {
+            // Can they admin it? (remove items/etc)
+            boolean canMod = lwc.isMod(player);
+            boolean canAdmin = lwc.canAdminProtection(player, protection);
 
-        // Can they admin it? (remove items/etc)
-        boolean canAdmin = lwc.canAdminProtection(player, protection);
+            // nope.avi
+            if (!canMod && !canAdmin) {
+                event.setCancelled(true);
+            }
 
-        // allow ACL users to edit donation chests
-        if (!canAdmin) {
-            canAdmin = protection.getAccess(player.getUniqueId().toString(), Permission.Type.PLAYER) == Permission.Access.PLAYER;
-        }
+            // If it's a supply chest and player drag items on its slot, check permission.
+        } else if (protection.getType() == Protection.Type.SUPPLY
+                && event.getRawSlots().stream().anyMatch(slot -> isRawSlotInTopInventory(event.getView(), slot))) {
+            // Can they admin it? (remove items/etc)
+            boolean canMod = lwc.isMod(player);
+            boolean canAdmin = lwc.canAdminProtection(player, protection);
 
-        // nope.avi
-        if (!canAdmin) {
-            event.setCancelled(true);
+            // nope.avi
+            if (!canMod && !canAdmin) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -1100,4 +1234,17 @@ public class LWCPlayerListener implements Listener {
         return true;
     }
 
+    /**
+     * Check if the rawSlot is smaller than top inventory size, that means
+     * specified slot is in the top inventory.
+     *
+     * @param view the inventory view.
+     * @param rawSlot the raw slot.
+     * @return true if specified raw slot is in the top inventory.
+     *
+     * @see InventoryView#getInventory(int)
+     */
+    private static boolean isRawSlotInTopInventory(InventoryView view, int rawSlot) {
+        return rawSlot < view.getTopInventory().getSize();
+    }
 }

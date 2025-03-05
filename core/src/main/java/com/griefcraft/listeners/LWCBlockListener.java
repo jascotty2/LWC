@@ -271,6 +271,14 @@ public class LWCBlockListener implements Listener {
         LWC lwc = plugin.getLWC();
         Player player = event.getPlayer();
         Block block = event.getBlockPlaced();
+        
+        String cacheKey = ProtectionCache.cacheKey(block.getLocation());
+        ProtectionCache cache = lwc.getProtectionCache();
+
+        // In the event they place a block, remove any known nulls there
+        if (cache.isKnownNull(cacheKey)) {
+            cache.remove(cacheKey);
+        }
 
         // check if the block is blacklisted
         if (blacklistedBlocks.contains(block.getType())) {
@@ -310,7 +318,11 @@ public class LWCBlockListener implements Listener {
                             case GREEN_SHULKER_BOX:
                             case RED_SHULKER_BOX:
                             case BLACK_SHULKER_BOX:
-                                if (!lwc.canAccessProtection(player, protection) || (protection.getType() == Protection.Type.DONATION && !lwc.canAdminProtection(player, protection))) {
+                                if (!lwc.canAccessProtection(player, protection)
+                                        || ((protection.getType() == Protection.Type.DONATION
+                                        || protection.getType() == Protection.Type.SUPPLY
+                                        || protection.getType() == Protection.Type.DISPLAY)
+                                        && !lwc.canAdminProtection(player, protection))) {
                                     // they can't access the protection ..
                                     event.setCancelled(true);
                                     lwc.sendLocale(player, "protection.general.locked.private", "block", LWC.materialToString(protection.getBlock()));
@@ -415,7 +427,12 @@ public class LWCBlockListener implements Listener {
 
         String autoRegisterType = lwc.resolveProtectionConfiguration(block, "autoRegister");
         // is it auto protectable?
-        if (!autoRegisterType.equalsIgnoreCase("private") && !autoRegisterType.equalsIgnoreCase("public")) {
+        if (autoRegisterType.equalsIgnoreCase("off")
+                || (!autoRegisterType.equalsIgnoreCase("private")
+                && !autoRegisterType.equalsIgnoreCase("public")
+                && !autoRegisterType.equalsIgnoreCase("donation")
+                && !autoRegisterType.equalsIgnoreCase("display")
+                && !autoRegisterType.equalsIgnoreCase("supply"))) {
             return;
         }
 

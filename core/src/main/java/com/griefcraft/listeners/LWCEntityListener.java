@@ -28,10 +28,6 @@
 
 package com.griefcraft.listeners;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.griefcraft.bukkit.EntityBlock;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.lwc.LWCPlugin;
@@ -39,7 +35,9 @@ import com.griefcraft.model.Flag;
 import com.griefcraft.model.Protection;
 import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegistrationPostEvent;
-
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -67,7 +65,7 @@ public class LWCEntityListener implements Listener {
     /**
      * The plugin instance
      */
-    private LWCPlugin plugin;
+    private final LWCPlugin plugin;
 
     public LWCEntityListener(LWCPlugin plugin) {
         this.plugin = plugin;
@@ -230,8 +228,12 @@ public class LWCEntityListener implements Listener {
 
         String autoRegisterType = lwc.resolveProtectionConfiguration(entity.getType(), "autoRegister");
 
-        if ((!autoRegisterType.equalsIgnoreCase("private"))
-            && (!autoRegisterType.equalsIgnoreCase("public"))) {
+        if (autoRegisterType.equalsIgnoreCase("off")
+                || (!autoRegisterType.equalsIgnoreCase("private")
+                && !autoRegisterType.equalsIgnoreCase("public")
+                && !autoRegisterType.equalsIgnoreCase("donation")
+                && !autoRegisterType.equalsIgnoreCase("display")
+                && !autoRegisterType.equalsIgnoreCase("supply"))) {
             return;
         }
 

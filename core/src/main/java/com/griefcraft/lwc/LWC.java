@@ -208,7 +208,7 @@ public class LWC {
     /**
      * Protection configuration cache
      */
-    private final Map<String, String> protectionConfigurationCache = new HashMap<String, String>();
+    private final Map<String, String> protectionConfigurationCache = new HashMap();
 
     /**
      * Whether fast-hopper-protection is enabled
@@ -248,8 +248,8 @@ public class LWC {
      * @return
      */
     public static String materialToString(Block block) {
-        if (block instanceof EntityBlock) {
-            return entityToString(((EntityBlock) block).getEntityType());
+        if (block instanceof EntityBlock e) {
+            return entityToString(e.getEntityType());
         }
         return materialToString(block.getType());
     }
@@ -462,6 +462,8 @@ public class LWC {
 
             case PRIVATE:
             case DONATION:
+            case DISPLAY:
+            case SUPPLY:
                 if (protection.isOwner(player)) {
                     return true;
                 }
@@ -700,7 +702,10 @@ public class LWC {
 
             if (type == Protection.Type.PASSWORD) {
                 sendLocale(player, "protection.general.locked.password", "block", materialToString(block), "owner", protection.getOwner());
-            } else if (type == Protection.Type.PRIVATE || type == Protection.Type.DONATION) {
+            } else if (type == Protection.Type.PRIVATE
+                    || type == Protection.Type.DONATION
+                    || type == Protection.Type.DISPLAY
+                    || type == Protection.Type.SUPPLY) {
                 sendLocale(player, "protection.general.locked.private", "block", materialToString(block), "owner", protection.getOwner());
             }
         }
@@ -755,6 +760,8 @@ public class LWC {
         switch (protection.getType()) {
             case PUBLIC:
             case DONATION:
+            case DISPLAY:
+            case SUPPLY:
                 return true;
 
             case PASSWORD:

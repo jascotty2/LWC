@@ -87,19 +87,19 @@ public class Protection {
         PRIVATE,
 
         /**
-         * Reserved / unused, to keep ordinal order
-         */
-        RESERVED1,
-
-        /**
-         * Reserved / unused, to keep ordinal order
-         */
-        RESERVED2,
-
-        /**
          * Allows players to deposit items into
          */
-        DONATION;
+        DONATION,
+
+        /**
+         * Allows players to look into but not take
+         */
+        DISPLAY,
+        
+        /**
+         * Allows players to take items from but not deposit
+         */
+        SUPPLY;
 
         /**
          * Match a protection type using its string form

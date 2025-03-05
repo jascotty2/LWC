@@ -47,6 +47,12 @@ commands:
     description: Modify an existing private protection.
     usage: /<command> <Modifications>
     permission: lwc.modify
+  cdisplay:
+    description: Creates a chest that can be looked into, but only removed by player with access.
+    usage: /<command>
+  csupply:
+    description: Creates a chest that can be taken from, but only added to by player with access.
+    usage: /<command>
   cunlock:
     description: Unlock a password-protected protection.
     usage: /<command> <password>
@@ -147,12 +153,20 @@ permissions:
           lwc.create.password: true
           lwc.create.private: true
           lwc.create.donation: true
+          lwc.create.display: true
+          lwc.create.supply: true
   lwc.create.public:
       description: Allows you to create a public protection.
   lwc.create.password:
       description: Allows you to create a password protection.
   lwc.create.private:
       description: Allows you to create a private protection.
+  lwc.create.donation:
+    description: Allows you to create a donation protection.
+  lwc.create.display:
+    description: Allows you to create a display protection.
+  lwc.create.supply:
+    description: Allows you to create a supply protection.
 
   lwc.modify:
       description: Allows you to modify protections you own.

@@ -147,6 +147,8 @@ public class CreateModule extends JavaModule {
                 break;
             case "private":
             case "donation":
+            case "display":
+            case "supply":
                 String[] rights = protectionData.split(" ");
                 protection = physDb.registerProtection(block.getType(), 
 						Protection.Type.matchType(protectionType), worldName, player.getUniqueId().toString(), 
@@ -235,6 +237,8 @@ public class CreateModule extends JavaModule {
                 break;
             case "private":
             case "donation":
+            case "display":
+            case "supply":
                 String[] rights = protectionData.split(" ");
                 protection = physDb.registerProtection(entity, Protection.Type.matchType(protectionType), player.getUniqueId().toString(), "");
                 lwc.sendLocale(player, "protection.interact.create.finalize");
