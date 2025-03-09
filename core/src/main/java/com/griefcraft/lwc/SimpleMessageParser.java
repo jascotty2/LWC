@@ -42,16 +42,23 @@ public class SimpleMessageParser implements MessageParser {
             put("%navy%", ChatColor.DARK_BLUE.toString());
             put("%green%", ChatColor.DARK_GREEN.toString());
             put("%blue%", ChatColor.DARK_AQUA.toString());
+            put("%dark_aqua%", ChatColor.DARK_AQUA.toString());
             put("%red%", ChatColor.DARK_RED.toString());
+            put("%dark_red%", ChatColor.DARK_RED.toString());
             put("%purple%", ChatColor.DARK_PURPLE.toString());
             put("%gold%", ChatColor.GOLD.toString());
             put("%lightgray%", ChatColor.GRAY.toString());
+            put("%light_gray%", ChatColor.GRAY.toString());
             put("%gray%", ChatColor.DARK_GRAY.toString());
             put("%darkpurple%", ChatColor.BLUE.toString());
+            put("%dark_purple%", ChatColor.BLUE.toString());
             put("%lightgreen%", ChatColor.GREEN.toString());
+            put("%light_green%", ChatColor.GREEN.toString());
             put("%lightblue%", ChatColor.AQUA.toString());
-            put("%rose%", ChatColor.DARK_RED.toString());
+            put("%light_blue%", ChatColor.AQUA.toString());
+            put("%rose%", ChatColor.RED.toString());
             put("%lightpurple%", ChatColor.LIGHT_PURPLE.toString());
+            put("%light_purple%", ChatColor.LIGHT_PURPLE.toString());
             put("%yellow%", ChatColor.YELLOW.toString());
             put("%white%", ChatColor.WHITE.toString());
         }
