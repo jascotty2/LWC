@@ -314,18 +314,26 @@ public class LWC {
 
         // some name normalizations
         if (name.contains("sign")) {
-            name = "Sign";
-        }
-
-        if (name.contains("furnace")) {
+            name = "sign";
+        } else if (name.contains("furnace")) {
             name = "furnace";
-        }
-
-        if (name.endsWith("_")) {
+        } else if (name.contains("trapdoor")) {
+            name = "trapdoor";
+        } else if (name.contains("door")) {
+            name = "door";
+        } else if (name.contains("button")) {
+            name = "button";
+        } else if (name.contains("wall_banner")) {
+            name = "wall_banner";
+        } else if (name.contains("fence_gate")) {
+            name = "fence_gate";
+        } else if (name.contains("shulker_box")) {
+            name = "shulker_box";
+        } else if (name.endsWith("_")) {
             name = name.substring(0, name.length() - 1);
         }
 
-        return name.toLowerCase();
+        return name;
     }
 
     /**
@@ -1464,7 +1472,7 @@ public class LWC {
     }
 
     /**
-     * Get the appropriate config value for the block (protections.block.node)
+     * Get the appropriate config value for the block (protections.blocks.node)
      *
      * @param block
      * @param node
@@ -1476,38 +1484,35 @@ public class LWC {
         }
 
         Material material = block.getType();
-        String cacheKey = block.getData() + "-" + material.toString() + "-" + node;
+        String cacheKey = material.toString() + "-" + node;
         if (protectionConfigurationCache.containsKey(cacheKey)) {
             return protectionConfigurationCache.get(cacheKey);
         }
 
+        // build a list of keys this material could be valid for
         List<String> names = new ArrayList();
 
-        String materialName = normalizeMaterialName(material);
-
-        // add the name & the block id
+        // add the name
+        String materialName = material.name().toLowerCase();
         names.add(materialName);
-        names.add(materialName + ":" + block.getData());
 
-        if (!materialName.equals(material.toString().toLowerCase())) {
-            names.add(material.toString().toLowerCase());
-            names.add(material.name().toLowerCase() + ":" + block.getData());
-        }
+        // next try a normalized name
+        names.add(normalizeMaterialName(material));
 
-        // Add the wildcards last so it can be overriden
-        names.add("*");
-        names.add(materialName + ":*");
-        if (!materialName.equals(material.toString().toLowerCase())) {
-            names.add(material.name().toLowerCase() + ":*");
-        }
-
+        // *_wildcards
         if (materialName.contains("_")) { // Prefix wildcarding for shulker boxes & gates
             int i = materialName.indexOf("_") + 1;
             while (i > 0) {
                 names.add("*_" + materialName.substring(i));
+                names.add("*_" + materialName.substring(i).toLowerCase());
+                names.add("*" + materialName.substring(i));
+                names.add("*" + materialName.substring(i).toLowerCase());
                 i = materialName.indexOf("_", i) + 1;
             }
         }
+
+        // Add the wildcards last so it can be overriden
+        names.add("*");
 
         String value = configuration.getString("protections." + node);
 

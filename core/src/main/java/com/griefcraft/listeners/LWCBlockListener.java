@@ -290,6 +290,8 @@ public class LWCBlockListener implements Listener {
                         protection.remove();
                     } else {
                         // is this protecting a block with an inventory?
+                        // todo: i'm sure there's a more reliable version-proof way to check this..
+                        // maybe not as quick, though.
                         switch (protection.getBlock().getType()) {
                             case CHEST:
                             case TRAPPED_CHEST:
