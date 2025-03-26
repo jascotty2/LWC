@@ -66,7 +66,7 @@ public class InfoModule extends JavaModule {
         StringBuilder flagStr = new StringBuilder();
         int nFlags = flags.size();
         for(Flag.Type flag : flags) {
-            flagStr.append(StringUtil.capitalizeFirstLetter(flag.name()));
+            flagStr.append(StringUtil.capitalizeFirstLetter(flag.name().replace('_', '-')));
             if(--nFlags > 0) {
                 flagStr.append(", ");
             }

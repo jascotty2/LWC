@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import com.griefcraft.cache.ProtectionCache;
 import com.griefcraft.lwc.LWC;
@@ -42,9 +43,8 @@ import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
 import com.griefcraft.scripting.event.LWCProtectionRegistrationPostEvent;
 import com.griefcraft.scripting.event.LWCRedstoneEvent;
 import com.griefcraft.util.matchers.DoubleChestMatcher;
-import java.util.logging.Level;
-import org.bukkit.ChatColor;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -54,7 +54,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockMultiPlaceEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
@@ -84,10 +90,6 @@ public class LWCBlockListener implements Listener {
 
         LWC lwc = plugin.getLWC();
         Block block = event.getBlock();
-
-        if (block == null) {
-            return;
-        }
 
         Protection protection = lwc.findProtection(block.getLocation());
 
@@ -137,10 +139,6 @@ public class LWCBlockListener implements Listener {
         LWC lwc = plugin.getLWC();
         Block block = event.getBlock();
         Player player = event.getPlayer();
-
-        if (block == null) {
-            return;
-        }
 
         Protection protection = lwc.findProtection(block.getLocation());
 
@@ -291,6 +289,7 @@ public class LWCBlockListener implements Listener {
                     } else {
                         // is this protecting a block with an inventory?
                         // todo: i'm sure there's a more reliable version-proof way to check this..
+                        // (protection.getBlock().getState() instanceof InventoryHolder)
                         // maybe not as quick, though.
                         switch (protection.getBlock().getType()) {
                             case CHEST:
@@ -450,6 +449,7 @@ public class LWCBlockListener implements Listener {
             type = Protection.Type.valueOf(autoRegisterType.toUpperCase());
         } catch (IllegalArgumentException e) {
             // No auto protect type found
+            lwc.log("Unknown protection type \"" + autoRegisterType + "\" for " + block.getType());
             return;
         }
 

@@ -45,6 +45,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public class LWCPlayer implements CommandSender {
 
@@ -434,5 +439,34 @@ public class LWCPlayer implements CommandSender {
 
     public void setOp(boolean b) {
         player.setOp(b);
+    }
+
+    @Override
+    public Component name() {
+        return Component.text(player.getName());
+    }
+
+    @Override
+    public void sendMessage(Identity identity, Component message, MessageType type) {
+    }
+
+    @Override
+    public void sendRichMessage(String message) {
+    }
+
+    @Override
+    public void sendRichMessage(String message, TagResolver... resolvers) {
+    }
+
+    @Override
+    public void sendPlainMessage(String message) {
+    }
+
+    @Override
+    public void sendMessage(BaseComponent component) {
+    }
+
+    @Override
+    public void sendMessage(BaseComponent... components) {
     }
 }

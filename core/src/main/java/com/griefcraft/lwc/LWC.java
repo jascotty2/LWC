@@ -79,6 +79,7 @@ import com.griefcraft.modules.flag.MagnetModule;
 import com.griefcraft.modules.free.FreeModule;
 import com.griefcraft.modules.history.HistoryModule;
 import com.griefcraft.modules.info.InfoModule;
+import com.griefcraft.modules.lecterns.LecternModule;
 import com.griefcraft.modules.limits.LimitsModule;
 import com.griefcraft.modules.limits.LimitsV2;
 import com.griefcraft.modules.modes.BaseModeModule;
@@ -1378,13 +1379,7 @@ public class LWC {
             return type != null && Boolean.parseBoolean(resolveProtectionConfiguration(type, "enabled"));
         }
 
-        Material material = block.getType();
-
-        if (material == null) {
-            return false;
-        }
-
-        return Boolean.parseBoolean(resolveProtectionConfiguration(block, "enabled"));
+        return Boolean.parseBoolean(resolveProtectionConfiguration(block.getType(), "enabled"));
     }
 
     /**
@@ -1407,13 +1402,7 @@ public class LWC {
      * @return
      */
     public boolean isProtectable(BlockState state) {
-        Material material = state.getType();
-
-        if (material == null) {
-            return false;
-        }
-
-        return Boolean.parseBoolean(resolveProtectionConfiguration(state, "enabled"));
+        return Boolean.parseBoolean(resolveProtectionConfiguration(state.getType(), "enabled"));
     }
 
     /**
@@ -1482,8 +1471,28 @@ public class LWC {
         if (block instanceof EntityBlock) {
             return resolveProtectionConfiguration(((EntityBlock) block).getEntityType(), node);
         }
+        return resolveProtectionConfiguration(block.getType(), node);
+    }
 
-        Material material = block.getType();
+    /**
+     * Get the appropriate config value for the block (protections.blocks.node)
+     *
+     * @param state
+     * @param node
+     * @return
+     */
+    public String resolveProtectionConfiguration(BlockState state, String node) {
+        return resolveProtectionConfiguration(state.getType(), node);
+    }
+
+    /**
+     * Get the appropriate config value for the block (protections.blocks.node)
+     *
+     * @param material
+     * @param node
+     * @return
+     */
+    public String resolveProtectionConfiguration(Material material, String node) {
         String cacheKey = material.toString() + "-" + node;
         if (protectionConfigurationCache.containsKey(cacheKey)) {
             return protectionConfigurationCache.get(cacheKey);
@@ -1509,99 +1518,6 @@ public class LWC {
                 names.add("*" + materialName.substring(i).toLowerCase());
                 i = materialName.indexOf("_", i) + 1;
             }
-        }
-
-        // Add the wildcards last so it can be overriden
-        names.add("*");
-
-        String value = configuration.getString("protections." + node);
-
-        for (String name : names) {
-            String temp = configuration.getString("protections.blocks." + name + "." + node);
-
-            if (temp != null && !temp.isEmpty()) {
-                value = temp;
-            }
-        }
-
-        protectionConfigurationCache.put(cacheKey, value);
-        return value;
-    }
-
-    /**
-     * Get the appropriate config value for the block (protections.block.node)
-     *
-     * @param state
-     * @param node
-     * @return
-     */
-    public String resolveProtectionConfiguration(BlockState state, String node) {
-        Material material = state.getType();
-        String cacheKey = state.getRawData() + "-" + material.toString() + "-" + node;
-        if (protectionConfigurationCache.containsKey(cacheKey)) {
-            return protectionConfigurationCache.get(cacheKey);
-        }
-
-        List<String> names = new ArrayList();
-
-        String materialName = normalizeMaterialName(material);
-
-        // add the name & the block id
-        names.add(materialName);
-        names.add(materialName + ":" + state.getRawData());
-
-        if (!materialName.equals(material.toString().toLowerCase())) {
-            names.add(material.name().toLowerCase());
-            names.add(material.name().toLowerCase() + ":" + state.getRawData());
-        }
-
-        // Add the wildcards last so it can be overriden
-        names.add("*");
-        names.add(materialName + ":*");
-        if (!materialName.equals(material.toString().toLowerCase())) {
-            names.add(material.name().toLowerCase() + ":*");
-        }
-
-        if (materialName.contains("_")) { // Prefix wildcarding for shulker boxes & gates
-            names.add("*_" + materialName.substring(materialName.indexOf("_") + 1));
-        }
-        String value = configuration.getString("protections." + node);
-
-        for (String name : names) {
-            String temp = configuration.getString("protections.blocks." + name + "." + node);
-
-            if (temp != null && !temp.isEmpty()) {
-                value = temp;
-            }
-        }
-
-        protectionConfigurationCache.put(cacheKey, value);
-        return value;
-    }
-
-    /**
-     * Get the appropriate config value for the block (protections.block.node)
-     *
-     * @param material
-     * @param node
-     * @return
-     */
-    public String resolveProtectionConfiguration(Material material, String node) {
-        String cacheKey = "00-" + material.toString() + "-" + node;
-        if (protectionConfigurationCache.containsKey(cacheKey)) {
-            return protectionConfigurationCache.get(cacheKey);
-        }
-
-        List<String> names = new ArrayList();
-
-        String materialName = normalizeMaterialName(material);
-
-        // add the name & the block id
-        names.add(material.name().toLowerCase());
-        names.add(materialName);
-
-        if (!materialName.equals(material.toString().toLowerCase())) {
-            names.add(material.toString().toLowerCase());
         }
 
         // Add the wildcards last so it can be overriden
@@ -1698,6 +1614,7 @@ public class LWC {
         registerModule(new UnlockModule());
         registerModule(new OwnersModule());
         registerModule(new DoorsModule());
+        registerModule(new LecternModule());
         registerModule(new DebugModule());
         registerModule(new CreditsModule());
         registerModule(new FixModule());

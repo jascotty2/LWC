@@ -4,12 +4,12 @@
     <artifactId>lwc</artifactId>
     <name>LWC</name>
     <packaging>jar</packaging>
-    <version>4.9.0-SNAPSHOT</version>
+    <version>4.9.1-SNAPSHOT</version>
 
     <parent>
         <groupId>com.griefcraft</groupId>
         <artifactId>lwc-parent</artifactId>
-        <version>4.9.0-SNAPSHOT</version>
+        <version>4.9.1-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -39,12 +39,26 @@
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <!-- paper-nms -->
+        <pluginRepository>
+            <id>bytecode.space</id>
+            <url>https://repo.bytecode.space/repository/maven-public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
             <version>${spigot.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- paper-nms -->
+        <dependency>
+            <groupId>ca.bkaw</groupId>
+            <artifactId>paper-nms</artifactId>
+            <version>1.21.4-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -77,6 +91,12 @@
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
             <version>7.0.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>5.1.0</version>
             <scope>provided</scope>
         </dependency>
         <!--
@@ -157,6 +177,21 @@
                 <version>3.1.0</version>
             </plugin>
             
+            <!-- paper-nms -->
+            
+            <plugin>
+                <groupId>ca.bkaw</groupId>
+                <artifactId>paper-nms-maven-plugin</artifactId>
+                <version>1.4.6</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>remap</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         
     </build>

@@ -166,7 +166,9 @@ public class Backup {
             rblock.setX(inputStream.readInt());
             rblock.setY(inputStream.readShort());
             rblock.setZ(inputStream.readInt());
-            rblock.setData(inputStream.read() & 0xFF);
+            // throw out garbage bit:
+            inputStream.read();
+            //rblock.setData(inputStream.read() & 0xFF);
             int itemCount = inputStream.readShort();
 
             for (int i = 0; i < itemCount; i++) {
@@ -207,7 +209,9 @@ public class Backup {
             rblock.setX(inputStream.readInt());
             rblock.setY(inputStream.readShort());
             rblock.setZ(inputStream.readInt());
-            rblock.setData(inputStream.read() & 0xFF);
+            // throw out unused data:
+            inputStream.read();
+            //rblock.setData(inputStream.read() & 0xFF);
             int itemCount = inputStream.readShort();
 
             for (int i = 0; i < itemCount; ++i) {
@@ -271,7 +275,8 @@ public class Backup {
             outputStream.writeInt(rblock.getX());
             outputStream.writeShort(rblock.getY());
             outputStream.writeInt(rblock.getZ());
-            outputStream.write((byte) rblock.getData());
+            // data byte is no longer used
+            outputStream.write((byte) 0);//rblock.getData());
             outputStream.writeShort(rblock.getItems().size());
 
             // Write the items if there are any

@@ -112,7 +112,7 @@ public class LWCEntityListener implements Listener {
             Protection protection = lwc.findProtection(block.getLocation());
             if (protection != null) {
                 boolean ignoreExplosions = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(protection.getBlock(), "ignoreExplosions"));
-                if (!(ignoreExplosions || protection.hasFlag(Flag.Type.ALLOWEXPLOSIONS))) {
+                if (!(ignoreExplosions || protection.hasFlag(Flag.Type.ALLOW_EXPLOSIONS))) {
                     event.setCancelled(true);
                 }
             }
@@ -131,7 +131,7 @@ public class LWCEntityListener implements Listener {
             Protection protection = lwc.findProtection(block.getLocation());
             if (protection != null) {
                 boolean ignoreExplosions = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(protection.getBlock(), "ignoreExplosions"));
-                if (ignoreExplosions || protection.hasFlag(Flag.Type.ALLOWEXPLOSIONS)) {
+                if (ignoreExplosions || protection.hasFlag(Flag.Type.ALLOW_EXPLOSIONS)) {
                     protection.remove();
                 }
             }

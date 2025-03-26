@@ -62,7 +62,7 @@ public class BaseFlagModule extends JavaModule {
         }
 
         boolean shouldAdd = data.substring(0, 1).equals("+");
-        String flagName = data.substring(1);
+        String flagName = data.substring(1).replace('-', '_');
 
         Flag.Type type = null;
 
@@ -114,7 +114,7 @@ public class BaseFlagModule extends JavaModule {
             // TODO
             String flags = "";
             for (Flag.Type type : Flag.Type.values()) {
-                flags += ChatColor.YELLOW + type.toString().toLowerCase() + ChatColor.WHITE + ", ";
+                flags += ChatColor.YELLOW + type.toString().toLowerCase().replace('_', '-') + ChatColor.WHITE + ", ";
             }
             flags = flags.substring(0, flags.length() - 2);
 
@@ -123,12 +123,12 @@ public class BaseFlagModule extends JavaModule {
         }
 
         LWCPlayer player = lwc.wrapPlayer(sender);
-        String flagName = args[0];
+        String flagName = args[0].replace('-', '_');
         String type = args[1].toLowerCase();
         String internalType; // + or -
 
         // Allow lwc.flag.?? (e.g lwc.flag.redstone) or optionally the umbrella node lwc.allflags
-        if (!lwc.hasPermission(sender, "lwc.flag." + flagName, "lwc.protect", "lwc.allflags")) {
+        if (!lwc.hasPermission(sender, "lwc.flag." + flagName.replace("_", ""), "lwc.protect", "lwc.allflags")) {
             lwc.sendLocale(sender, "protection.accessdenied");
             return;
         }
@@ -136,7 +136,7 @@ public class BaseFlagModule extends JavaModule {
         // verify the flag name
         Flag.Type match = null;
         for (Flag.Type flag : Flag.Type.values()) {
-            if (flag.toString().equalsIgnoreCase(flagName) || flag.toString().toLowerCase().startsWith(flagName.toLowerCase())) {
+            if (flag.toString().equalsIgnoreCase(flagName)) {
                 match = flag;
                 flagName = flag.toString(); // get the case-correct name while we're there
                 break;

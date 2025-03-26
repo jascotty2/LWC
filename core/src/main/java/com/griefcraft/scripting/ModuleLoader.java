@@ -174,19 +174,19 @@ public class ModuleLoader {
     /**
      * Map of loaded modules
      */
-    private final Map<Plugin, List<MetaData>> pluginModules = Collections.synchronizedMap(new LinkedHashMap<Plugin, List<MetaData>>());
+    private final Map<Plugin, List<MetaData>> pluginModules = Collections.synchronizedMap(new LinkedHashMap());
 
     /**
      * A cache used to get a list of modules for any given event. Reflection is used to find which events modules implement.
      * This was mainly added for backwards compatibility reasons (vs events to be individually registered). This still
      * achieves the same effect by using reflection.
      */
-    private final Map<Event, List<Module>> fastModuleCache = new HashMap<Event, List<Module>>();
+    private final Map<Event, List<Module>> fastModuleCache = new HashMap();
 
     /**
      * Toasty caches for doesObjectOverrideMethod
      */
-    private final Map<String, Boolean> overrideCache = new HashMap<String, Boolean>();
+    private final Map<String, Boolean> overrideCache = new HashMap();
 
     public ModuleLoader(LWC lwc) {
         this.lwc = lwc;
@@ -198,7 +198,7 @@ public class ModuleLoader {
      */
     private void populateFastModuleCache() {
         for (Event event : Event.values()) {
-            fastModuleCache.put(event, new ArrayList<Module>(10));
+            fastModuleCache.put(event, new ArrayList(10));
         }
     }
 
@@ -281,9 +281,9 @@ public class ModuleLoader {
     /**
      * Check if a method overrides a method using reflection. This method uses a cache for constant access after
      * the caches are warm and toasty.
-     * <p/>
+     * <p>
      * This assumes the object is overriding JavaModule
-     *
+     * </p>
      * @param object
      * @param method
      * @return
@@ -336,32 +336,22 @@ public class ModuleLoader {
             List<Module> modules = fastModuleCache.get(event.getEventType());
             Event type = event.getEventType();
             for (Module module : modules) {
-                if (type == Event.INTERACT_PROTECTION) {
-                    module.onProtectionInteract((LWCProtectionInteractEvent) event);
-                } else if (type == Event.INTERACT_BLOCK) {
-                    module.onBlockInteract((LWCBlockInteractEvent) event);
-                } else if (type == Event.INTERACT_ENTITY) {
-                    module.onEntityInteract((LWCEntityInteractEvent) event);
-                } else if (type == Event.SEND_LOCALE) {
-                    module.onSendLocale((LWCSendLocaleEvent) event);
-                } else if (type == Event.ACCESS_REQUEST) {
-                    module.onAccessRequest((LWCAccessEvent) event);
-                } else if (type == Event.COMMAND) {
-                    module.onCommand((LWCCommandEvent) event);
-                } else if (type == Event.DROP_ITEM) {
-                    module.onDropItem((LWCDropItemEvent) event);
-                } else if (type == Event.DESTROY_PROTECTION) {
-                    module.onDestroyProtection((LWCProtectionDestroyEvent) event);
-                }else if (type == Event.REGISTER_PROTECTION) {
-                    module.onRegisterProtection((LWCProtectionRegisterEvent) event);
-                } else if (type == Event.POST_REMOVAL) {
-                    module.onPostRemoval((LWCProtectionRemovePostEvent) event);
-                } else if (type == Event.POST_REGISTRATION) {
-                    module.onPostRegistration((LWCProtectionRegistrationPostEvent) event);
-                } else if (type == Event.REDSTONE) {
-                    module.onRedstone((LWCRedstoneEvent) event);
-                } else if (type == Event.RELOAD_EVENT) {
-                    module.onReload((LWCReloadEvent) event);
+                if (null != type) switch (type) {
+                    case INTERACT_PROTECTION -> module.onProtectionInteract((LWCProtectionInteractEvent) event);
+                    case INTERACT_BLOCK -> module.onBlockInteract((LWCBlockInteractEvent) event);
+                    case INTERACT_ENTITY -> module.onEntityInteract((LWCEntityInteractEvent) event);
+                    case SEND_LOCALE -> module.onSendLocale((LWCSendLocaleEvent) event);
+                    case ACCESS_REQUEST -> module.onAccessRequest((LWCAccessEvent) event);
+                    case COMMAND -> module.onCommand((LWCCommandEvent) event);
+                    case DROP_ITEM -> module.onDropItem((LWCDropItemEvent) event);
+                    case DESTROY_PROTECTION -> module.onDestroyProtection((LWCProtectionDestroyEvent) event);
+                    case REGISTER_PROTECTION -> module.onRegisterProtection((LWCProtectionRegisterEvent) event);
+                    case POST_REMOVAL -> module.onPostRemoval((LWCProtectionRemovePostEvent) event);
+                    case POST_REGISTRATION -> module.onPostRegistration((LWCProtectionRegistrationPostEvent) event);
+                    case REDSTONE -> module.onRedstone((LWCRedstoneEvent) event);
+                    case RELOAD_EVENT -> module.onReload((LWCReloadEvent) event);
+                    default -> {
+                    }
                 }
             }
         } catch (Throwable throwable) {
@@ -371,10 +361,11 @@ public class ModuleLoader {
 
     /**
      * Shutdown the plugin loader
-     *
-     * @todo broadcast UNLOAD
      */
     public void shutdown() {
+        pluginModules.values().forEach(p -> p.stream()
+                .filter(m -> m.isLoaded())
+                .forEach(m -> m.getModule().unload()));
         pluginModules.clear();
     }
 
@@ -384,7 +375,7 @@ public class ModuleLoader {
     public void loadAll() {
         // Ensure LWC is at the head of the list
         synchronized (pluginModules) {
-            Map<Plugin, List<MetaData>> newMap = new LinkedHashMap<Plugin, List<MetaData>>();
+            Map<Plugin, List<MetaData>> newMap = new LinkedHashMap();
 
             // Add LWC
             newMap.put(lwc.getPlugin(), pluginModules.get(lwc.getPlugin()));
@@ -466,7 +457,7 @@ public class ModuleLoader {
         }
 
         if (modules == null) {
-            modules = new ArrayList<MetaData>();
+            modules = new ArrayList();
         }
 
         MetaData metaData = new MetaData(module);

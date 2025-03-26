@@ -64,6 +64,11 @@ public interface Module {
     public void onReload(LWCReloadEvent event);
 
     /**
+     * Called when the module is unloaded
+     */
+    public void unload();
+
+    /**
      * Find out the access level of a player to a protection
      *
      * @param event

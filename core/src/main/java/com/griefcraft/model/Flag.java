@@ -58,17 +58,37 @@ public class Flag {
         /**
          * The door will automatically close after the time configured in plugins/LWC/doors.yml
          */
-        AUTOCLOSE,
+        AUTO_CLOSE,
 
         /**
          * Allows explosions to blow a protection up
          */
-        ALLOWEXPLOSIONS,
+        ALLOW_EXPLOSIONS,
 
         /**
          * Controls whether or not hoppers can be used on a protection
          */
-        HOPPER;
+        HOPPER,
+
+        /**
+         * Controls whether or not hoppers can be used on a protection to place items in
+         */
+        HOPPER_IN,
+
+        /**
+         * Controls whether or not hoppers can be used on a protection to take items out
+         */
+        HOPPER_OUT,
+
+        /**
+         * Sets a Lectern to always start at the first page
+         */
+        LECTERN_AUTO_REWIND,
+
+        /**
+         * Provides a fake Lectern to any non-editing player, preventing page turns between players (implies autorewind)
+         */
+        LECTERN_VIEW_ONLY;
 
         Type() {
             this(false);
@@ -151,7 +171,7 @@ public class Flag {
 
     @Override
     public String toString() {
-        return StringUtil.capitalizeFirstLetter(type.toString());
+        return StringUtil.capitalizeFirstLetter(type.toString().replace('_', '-'));
     }
 
     /**

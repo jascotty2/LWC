@@ -25,7 +25,6 @@
  * authors and contributors and should not be interpreted as representing official policies,
  * either expressed or implied, of anybody else.
  */
-
 package com.griefcraft.scripting;
 
 import com.griefcraft.lwc.LWC;
@@ -46,12 +45,14 @@ import com.griefcraft.scripting.event.LWCSendLocaleEvent;
 public class JavaModule implements Module {
 
     /**
-     * Allow the event to occur (e.g allow the redstone, allow a protection destruction, and so on)
+     * Allow the event to occur (e.g allow the redstone, allow a protection
+     * destruction, and so on)
      */
     public final static Result ALLOW = Result.ALLOW;
 
     /**
-     * Cancel the event from happening (e.g disallow protection interaction, disallow protection registration)
+     * Cancel the event from happening (e.g disallow protection interaction,
+     * disallow protection registration)
      */
     public final static Result CANCEL = Result.CANCEL;
 
@@ -64,55 +65,45 @@ public class JavaModule implements Module {
     }
 
     public void onReload(LWCReloadEvent event) {
+    }
 
+    public void unload() {
     }
 
     public void onAccessRequest(LWCAccessEvent event) {
-
     }
 
     public void onDropItem(LWCDropItemEvent event) {
-
     }
 
     public void onCommand(LWCCommandEvent event) {
-
     }
 
     public void onRedstone(LWCRedstoneEvent event) {
-
     }
 
     public void onDestroyProtection(LWCProtectionDestroyEvent event) {
-
     }
 
     public void onProtectionInteract(LWCProtectionInteractEvent event) {
-
     }
 
     public void onBlockInteract(LWCBlockInteractEvent event) {
-
     }
 
     public void onEntityInteract(LWCEntityInteractEvent event) {
-
     }
 
     public void onRegisterProtection(LWCProtectionRegisterEvent event) {
-
     }
 
     public void onPostRegistration(LWCProtectionRegistrationPostEvent event) {
-
     }
 
     public void onPostRemoval(LWCProtectionRemovePostEvent event) {
-
     }
 
     public void onSendLocale(LWCSendLocaleEvent event) {
-
     }
 
 }

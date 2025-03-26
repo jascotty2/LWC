@@ -35,6 +35,7 @@ import com.griefcraft.model.Flag;
 import com.griefcraft.model.LWCPlayer;
 import com.griefcraft.model.Permission;
 import com.griefcraft.model.Protection;
+import com.griefcraft.modules.lecterns.LecternModule;
 import com.griefcraft.scripting.Module;
 import com.griefcraft.scripting.event.LWCBlockInteractEvent;
 import com.griefcraft.scripting.event.LWCDropItemEvent;
@@ -49,7 +50,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.ChiseledBookshelf;
 import org.bukkit.block.Container;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Hopper;
@@ -129,9 +129,9 @@ public class LWCPlayerListener implements Listener {
 
         // if the initiator is the same as the source it is a dropper i.e. depositing items
         if (event.getInitiator() == event.getSource()) {
-            result = handleMoveItemEvent(event.getInitiator(), event.getDestination());
+            result = handleMoveItemEvent(event, event.getInitiator(), event.getDestination());
         } else {
-            result = handleMoveItemEvent(event.getInitiator(), event.getSource());
+            result = handleMoveItemEvent(event, event.getInitiator(), event.getSource());
         }
 
         if (result) {
@@ -144,7 +144,7 @@ public class LWCPlayerListener implements Listener {
      *
      * @param inventory
      */
-    private boolean handleMoveItemEvent(Inventory initiator, Inventory inventory) {
+    private boolean handleMoveItemEvent(InventoryMoveItemEvent event, Inventory initiator, Inventory inventory) {
         if (inventory == null) {
             return false;
         }
@@ -222,9 +222,12 @@ public class LWCPlayerListener implements Listener {
         }
 
         boolean denyHoppers = Boolean.parseBoolean(lwc.resolveProtectionConfiguration(protectionSource, "denyHoppers"));
+        boolean protectHopper = protection.hasFlag(Flag.Type.HOPPER);
+        boolean protectHopperIn = inventory == event.getDestination() && protection.hasFlag(Flag.Type.HOPPER_IN);
+        boolean protectHopperOut = inventory == event.getSource() && protection.hasFlag(Flag.Type.HOPPER_OUT);
 
         // xor = (a && !b) || (!a && b)
-        return denyHoppers ^ protection.hasFlag(Flag.Type.HOPPER);
+        return denyHoppers ^ (protectHopper || protectHopperIn || protectHopperOut);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -321,9 +324,9 @@ public class LWCPlayerListener implements Listener {
             // modify canAccess if this is a Chiseled Bookshelf for donation/supply types
             if (canAccess && CHISELED_BOOKSHELF != null
                     && CHISELED_BOOKSHELF.equals(block.getType())
-                    && block.getState() instanceof ChiseledBookshelf
+                    && block.getState() instanceof org.bukkit.block.ChiseledBookshelf
                     && block.getBlockData() instanceof org.bukkit.block.data.type.ChiseledBookshelf) {
-                final ChiseledBookshelf chiseledBookshelf = (ChiseledBookshelf) block.getState();
+                final org.bukkit.block.ChiseledBookshelf chiseledBookshelf = (org.bukkit.block.ChiseledBookshelf) block.getState();
                 final org.bukkit.block.data.type.ChiseledBookshelf chiseledBookshelfBlockData = (org.bukkit.block.data.type.ChiseledBookshelf) block.getBlockData();
                 if (chiseledBookshelfBlockData.getFacing() == event.getBlockFace()) {
                     final Vector clickedPosition = event.getClickedPosition();
@@ -441,7 +444,11 @@ public class LWCPlayerListener implements Listener {
             e.printStackTrace();
         }
     }
-
+//    @EventHandler(ignoreCancelled = true)
+//    public void onTakeLecternBook(io.papermc.paper.event.player.PlayerLecternPageChangeEvent event) {
+//        System.out.println(event.toString());
+//    }
+    
     @EventHandler(ignoreCancelled = true)
     public void onTakeLecternBook(PlayerTakeLecternBookEvent event) {
         if (!LWC.ENABLED) {
@@ -521,13 +528,12 @@ public class LWCPlayerListener implements Listener {
         }
 
         try {
-            if (holder instanceof BlockState) {
-                location = ((BlockState) holder).getLocation();
-            } else if (holder instanceof DoubleChest) {
-                location = ((DoubleChest) holder).getLocation();
-            } else if (holder instanceof Minecart) {
+            if (holder instanceof BlockState bs) {
+                location = bs.getLocation();
+            } else if (holder instanceof DoubleChest dc) {
+                location = dc.getLocation();
+            } else if (holder instanceof Minecart m) {
                 holderIsEntity = true;
-                Minecart m = (Minecart) holder;
                 int A = EntityBlock.calcHash(m.getUniqueId().hashCode());
                 location = new Location(m.getWorld(), A, A, A);
             } else {
@@ -582,7 +588,7 @@ public class LWCPlayerListener implements Listener {
             // Item their cursor has
             ItemStack cursor = event.getCursor();
 
-            if (item == null || item.getType() == null || item.getType() == Material.AIR) {
+            if (item == null || item.getType() == Material.AIR) {
                 return;
             }
 
@@ -593,7 +599,7 @@ public class LWCPlayerListener implements Listener {
             }
 
             // Are they inserting a stack?
-            if (cursor != null && item.getType() == cursor.getType()) {
+            if (item.getType() == cursor.getType()) {
                 boolean enchantmentsEqual = areEnchantmentsEqual(item, cursor);
 
                 // If they are clicking an item of the stack type, they are inserting it into the inventory,
@@ -705,10 +711,10 @@ public class LWCPlayerListener implements Listener {
         }
 
         try {
-            if (holder instanceof BlockState) {
-                location = ((BlockState) holder).getLocation();
-            } else if (holder instanceof DoubleChest) {
-                location = ((DoubleChest) holder).getLocation();
+            if (holder instanceof BlockState bs) {
+                location = bs.getLocation();
+            } else if (holder instanceof DoubleChest dc) {
+                location = dc.getLocation();
             } else {
                 return;
             }

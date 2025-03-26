@@ -161,7 +161,7 @@ public class DoorsModule extends JavaModule {
                 !block.getType().name().contains("IRON");
         changeDoorStates(true, (opensWhenClicked ? null : block), doubleDoorBlock);
 
-        if (action == Action.OPEN_AND_CLOSE || protection.hasFlag(Flag.Type.AUTOCLOSE)) {
+        if (action == Action.OPEN_AND_CLOSE || protection.hasFlag(Flag.Type.AUTO_CLOSE)) {
             // Abuse the fact that we still use final variables inside the task
             // The double door block object is initially only assigned if we need
             // it, so we just create a second variable ^^

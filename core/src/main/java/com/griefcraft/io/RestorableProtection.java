@@ -93,10 +93,12 @@ public class RestorableProtection implements Restorable {
      */
     private long updated;
 
+    @Override
     public Type getType() {
         return Type.PROTECTION;
     }
 
+    @Override
     public void restore() {
         LWC lwc = LWC.getInstance();
         Protection protection = lwc.getPhysicalDatabase().registerProtection(blockType, Protection.Type.values()[protectionType],

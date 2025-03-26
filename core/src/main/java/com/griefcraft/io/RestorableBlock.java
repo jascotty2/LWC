@@ -73,67 +73,67 @@ public class RestorableBlock implements Restorable {
     private int z;
 
     /**
-     * The block data
+     * The block data (no longer used in 1.13+)
      */
-    private int data;
+    //private int data;
 
     /**
      * The items in this block's inventory if it has one
      */
-    private final Map<Integer, ItemStack> items = new HashMap<Integer, ItemStack>();
+    private final Map<Integer, ItemStack> items = new HashMap();
 
+    @Override
     public Type getType() {
         return Type.BLOCK;
     }
 
+    @Override
     public void restore() {
         LWC lwc = LWC.getInstance();
 
-        lwc.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(lwc.getPlugin(), new Runnable() {
-            public void run() {
-                if (x > EntityBlock.POSITION_OFFSET && y > EntityBlock.POSITION_OFFSET && z > EntityBlock.POSITION_OFFSET) {
-                    //TODO: Add ability to rebuild block entities
-                    return;
+        lwc.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(lwc.getPlugin(), () -> {
+            if (x > EntityBlock.POSITION_OFFSET && y > EntityBlock.POSITION_OFFSET && z > EntityBlock.POSITION_OFFSET) {
+                //TODO: Add ability to rebuild block entities
+                return;
+            }
+            
+            Server server = Bukkit.getServer();
+            
+            // Get the world
+            World bworld = server.getWorld(world);
+            
+            // Not found :-(
+            if (world == null) {
+                return;
+            }
+            
+            // Get the block we want
+            Block block = bworld.getBlockAt(x, y, z);
+            
+            // Begin screwing with shit :p
+            block.setType(blockType);
+            //block.getState().setRawData((byte) data);
+            block.getState().update();
+            
+            if (!items.isEmpty()) {
+                if (!(block.getState() instanceof InventoryHolder)) {
+                    System.out.println(String.format("The block at [%d, %d, %d] has backed up items but no longer supports them. Why? %s", x, y, z, block.toString()));
                 }
-
-                Server server = Bukkit.getServer();
-
-                // Get the world
-                World bworld = server.getWorld(world);
-
-                // Not found :-(
-                if (world == null) {
-                    return;
-                }
-
-                // Get the block we want
-                Block block = bworld.getBlockAt(x, y, z);
-
-                // Begin screwing with shit :p
-                block.setType(blockType);
-                block.getState().setRawData((byte) data);
-                block.getState().update();
-
-                if (items.size() > 0) {
-                    if (!(block.getState() instanceof InventoryHolder)) {
-                        System.out.println(String.format("The block at [%d, %d, %d] has backed up items but no longer supports them. Why? %s", x, y, z, block.toString()));
+                
+                // Get the block's inventory
+                Inventory inventory = ((InventoryHolder) block.getState()).getInventory();
+                
+                // Set all of the items to it
+                for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+                    int slot = entry.getKey();
+                    ItemStack stack = entry.getValue();
+                    
+                    if (stack == null) {
+                        continue;
                     }
-
-                    // Get the block's inventory
-                    Inventory inventory = ((InventoryHolder) block.getState()).getInventory();
-
-                    // Set all of the items to it
-                    for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
-                        int slot = entry.getKey();
-                        ItemStack stack = entry.getValue();
-
-                        if (stack == null) {
-                            continue;
-                        }
-
-                        // Add it to the inventory
-                        inventory.setItem(slot, stack);
-                    }
+                    
+                    // Add it to the inventory
+                    inventory.setItem(slot, stack);
                 }
             }
         });
@@ -156,7 +156,7 @@ public class RestorableBlock implements Restorable {
         rblock.x = block.getX();
         rblock.y = block.getY();
         rblock.z = block.getZ();
-        rblock.data = block.getData();
+        //rblock.data = block.getData();
 
         BlockState state = block.getState();
 
@@ -239,13 +239,13 @@ public class RestorableBlock implements Restorable {
         this.z = z;
     }
 
-    public int getData() {
-        return data;
-    }
+//    public int getData() {
+//        return data;
+//    }
 
-    public void setData(int data) {
-        this.data = data;
-    }
+//    public void setData(int data) {
+//        this.data = data;
+//    }
 
     public Map<Integer, ItemStack> getItems() {
         return items;

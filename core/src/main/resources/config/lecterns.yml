@@ -1,0 +1,4 @@
+# Lectern Interface module
+lecterns:
+    enabled: true
+
